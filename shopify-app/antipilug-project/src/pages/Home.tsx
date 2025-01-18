@@ -4,7 +4,8 @@ import React from 'react';
 const Home: React.FC = () => {
   return (
     <div>
-      <h1>Welcome to the Antipilug Project</h1>
+      <h1>Home</h1>
+      <p>Show latest talks, videos, researches, updates in the news, and relevant content.</p>
     </div>
   );
 };
