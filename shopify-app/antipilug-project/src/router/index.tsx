@@ -8,6 +8,7 @@ import HelpCenter from '../pages/HelpCenter';
 import About from '../pages/About';
 import Matchmaking from '../pages/Matchmaking';
 import SearchResults from '../pages/SearchResults';
+import Research from '../pages/Research';
 
 const Router: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const Router: React.FC = () => {
       <Route path="/about" element={<About />} />
       <Route path="/matchmaking" element={<Matchmaking />} />
       <Route path="/search" element={<SearchResults />} />
+      <Route path="/research" element={<Research />} />
     </Routes>
   );
 };
