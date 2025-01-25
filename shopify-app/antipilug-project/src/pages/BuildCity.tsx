@@ -3,44 +3,34 @@ import { Typography, Box, Button } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import './BuildCity.scss';
 
+// Updated building list
 const buildings = [
-  { type: 'Farm', emoji: '🌾', cost: 50 },
-  { type: 'House', emoji: '🏠', cost: 100 },
-  { type: 'Synagogue', emoji: '🕍', cost: 200 },
+  { type: 'Farm', emoji: '🌾', cost: 2 },
+  { type: 'Market', emoji: '🛒', cost: 5 },
+  { type: 'House', emoji: '🏠', cost: 4 },
+  { type: 'Townhall', emoji: '🏛️', cost: 7 },
+  { type: 'Synagogue', emoji: '🕍', cost: 8 },
 ];
 
 const BuildCity: React.FC = () => {
   const location = useLocation();
-  const { level, xp, xpToNextLevel } = location.state || { level: 1, xp: 0, xpToNextLevel: 100 };
+  const { level, points } = location.state || { level: 1, points: 0 };
 
-  interface Building {
-    type: string;
-    position: number[];
-  }
-
-  interface City {
-    level: number;
-    subLevel: number;
-    xp: number;
-    xpToNextLevel: number;
-    buildings: Building[];
-    grid: string[][];
-  }
-
-  const [city, setCity] = useState<City>({
+  const [city, setCity] = useState({
     level,
-    subLevel: 0,
-    xp,
-    xpToNextLevel,
+    points: Math.floor(points / 10), // Divide current points by 10
     buildings: [],
-    grid: Array(5).fill(null).map(() => Array(5).fill("⬜")),
+    grid: Array(9) // 9 rows
+      .fill(null)
+      .map(() => Array(10).fill("⬜")), // 10 columns
   });
 
   const [message, setMessage] = useState('');
 
+  // Function to handle adding buildings
   const addBuilding = (building: { type: string; emoji: string; cost: number }) => {
-    if (city.xp < building.cost) {
-      setMessage(`Not enough XP to build ${building.type}`);
+    if (city.points < building.cost) {
+      setMessage(`Not enough points to build ${building.type}`);
       return;
     }
 
@@ -51,9 +41,8 @@ const BuildCity: React.FC = () => {
           newGrid[i][j] = building.emoji;
           setCity({
             ...city,
-            buildings: [...city.buildings, { type: building.type, position: [i, j] }],
             grid: newGrid,
-            xp: city.xp - building.cost,
+            points: city.points - building.cost,
           });
           setMessage('');
           return;
@@ -66,33 +55,43 @@ const BuildCity: React.FC = () => {
   return (
     <div className="build-city">
       <Box className="city-animation">
-        <Typography variant="h4">Building Your City...</Typography>
+        {/* Points Display */}
+        <Typography variant="h6" className="points-display">
+          Current Points: {city.points}
+        </Typography>
+
+        {/* Controls */}
+        <Box className="controls">
+          {buildings
+            .sort((a, b) => a.cost - b.cost) // Sort buttons by cost
+            .map((building) => (
+              <Button
+                key={building.type}
+                variant="contained"
+                color="primary"
+                onClick={() => addBuilding(building)}
+              >
+                Build {building.type} ({building.cost} points)
+              </Button>
+            ))}
+        </Box>
+
+        {/* Error/Info Message */}
+        {message && <Typography variant="body2" color="error">{message}</Typography>}
+
+        {/* City Grid */}
         <Box className="city-container">
           {city.grid.map((row, i) =>
             row.map((cell, j) => (
               <Box
                 key={`${i}-${j}`}
                 className={`city-block ${cell !== "⬜" ? "filled" : ""}`}
-                onClick={() => cell === "⬜" && addBuilding(buildings[0])} // Default to building a farm
               >
                 {cell}
               </Box>
             ))
           )}
         </Box>
-        <Box className="controls">
-          {buildings.map((building) => (
-            <Button
-              key={building.type}
-              variant="contained"
-              color="primary"
-              onClick={() => addBuilding(building)}
-            >
-              Build {building.type} ({building.cost} XP)
-            </Button>
-          ))}
-        </Box>
-        {message && <Typography variant="body2" color="error">{message}</Typography>}
       </Box>
     </div>
   );

@@ -1,33 +1,58 @@
 .build-city {
-    padding: 20px;
-    padding-top: 80px; // Adjust for navbar height
+    padding: 0;
+    margin: 0;
     background-color: #f4f7f6;
     text-align: center;
+    height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   
     .city-animation {
-      margin-top: 50px;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%; /* Full width */
+      margin-top: 70px; /* Lower the content to sit below the navbar */
+      height: calc(100vh - 70px); /* Adjust height to exclude the navbar */
+    }
+  
+    .points-display {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #333;
+    }
+  
+    .controls {
+      margin-bottom: 10px; /* Add spacing between points and buttons */
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      width: 100%; /* Full width */
+      max-width: 1200px;
     }
   
     .city-container {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); /* Dynamic grid */
+      gap: 5px;
+      width: 100%; /* Full width */
+      height: calc(100vh - 180px); /* Adjust height for available space */
       justify-content: center;
-      margin-top: 20px;
+      align-content: stretch; /* Stretch vertically */
+      overflow: hidden; /* Prevent scrolling */
     }
   
     .city-block {
-      width: 100%;
-      padding-top: 100%; // Maintain aspect ratio
-      position: relative;
-      background-color: #f0f0f0;
-      border-radius: 4px;
-      transition: transform 0.2s ease-in-out, background-color 0.2s ease;
-      animation: fadeIn 0.5s ease-in-out;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f9f9f9;
+      font-size: 1.2rem;
+      border: 1px solid #ddd;
+      transition: transform 0.2s ease, background-color 0.2s ease;
   
       &.filled {
         background-color: #3f51b5;
@@ -35,53 +60,19 @@
       }
   
       &:hover {
-        transform: scale(1.1);
-        background-color: #e0e0e0;
-      }
-  
-      &::after {
-        content: attr(data-emoji);
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 2rem;
+        transform: scale(1.05);
+        background-color: #e0f7fa;
       }
     }
   
-    .controls {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
+    @media (max-width: 768px) {
+      .city-container {
+        grid-template-columns: repeat(5, 1fr); /* Adjust column count for smaller screens */
+      }
   
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-  
-    @keyframes popIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-  
-    @keyframes glow {
-      from {
-        box-shadow: 0 0 5px #007bff;
-      }
-      to {
-        box-shadow: 0 0 20px #007bff;
+      .city-block {
+        font-size: 1rem; /* Adjust block size for smaller screens */
       }
     }
   }
+  

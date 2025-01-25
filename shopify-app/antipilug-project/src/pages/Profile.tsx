@@ -12,7 +12,7 @@ const Profile: React.FC = () => {
     name: 'John Doe',
     coins: 120,
     level: 5,
-    xp: 350,
+    points: 350,
     xpToNextLevel: 500,
     callsMade: 30,
     likesReceived: 150,
@@ -38,7 +38,7 @@ const Profile: React.FC = () => {
   ];
 
   const handleLevelClick = () => {
-    navigate('/build-city', { state: { level: user.level, xp: user.xp, xpToNextLevel: user.xpToNextLevel } });
+    navigate('/build-city', { state: { level: user.level, points: user.points } });
   };
 
   const handleStatisticsClick = () => {
@@ -76,11 +76,11 @@ const Profile: React.FC = () => {
                   <Typography variant="body1">Level {user.level}</Typography>
                   <LinearProgress
                     variant="determinate"
-                    value={(user.xp / user.xpToNextLevel) * 100}
+                    value={(user.points / user.xpToNextLevel) * 100}
                     className="level-progress"
                   />
                   <Typography variant="body2">
-                    {user.xp} / {user.xpToNextLevel} XP
+                    {user.points} / {user.xpToNextLevel} Points
                   </Typography>
                 </CardContent>
               </Card>
