@@ -1,0 +1,128 @@
+.profile {
+    padding: 20px;
+    padding-top: 80px; // Adjust for navbar height
+    background-color: #f4f7f6;
+  
+    .profile-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+  
+      .profile-picture {
+        width: 150px;
+        height: 150px;
+        margin-right: 20px;
+      }
+  
+      .profile-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+  
+        .profile-name {
+          font-size: 24px;
+          font-weight: bold;
+          color: #333;
+        }
+  
+        .profile-bio {
+          font-size: 16px;
+          color: #555;
+        }
+  
+        .profile-age {
+          font-size: 14px;
+          color: #777;
+        }
+  
+        .profile-coins {
+          display: flex;
+          align-items: center;
+          margin-top: 10px;
+          color: #555;
+          .coins-icon {
+            font-size: 24px;
+            color: #ffd700;
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  
+    .profile-details {
+      .profile-card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        background-color: white;
+        text-align: center;
+  
+        .MuiLinearProgress-root {
+          margin-top: 10px;
+          height: 10px;
+          border-radius: 5px;
+  
+          .MuiLinearProgress-bar {
+            background-color: #3f51b5;
+          }
+        }
+  
+        .level-progress {
+          .MuiLinearProgress-bar {
+            background: linear-gradient(90deg, #ff6f00, #ff8f00, #ffca28);
+          }
+        }
+      }
+  
+      .level-card,
+      .statistics-card {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        width: 100%; // Ensure the card stretches fully
+  
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+  
+      .friends-card {
+        .friends-list {
+          max-height: 300px; // Adjust height as needed
+          overflow-y: auto;
+  
+          /* Custom scrollbar styles */
+          &::-webkit-scrollbar {
+            width: 8px;
+          }
+  
+          &::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+          }
+  
+          &::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+          }
+  
+          &::-webkit-scrollbar-thumb:hover {
+            background: #555;
+          }
+        }
+      }
+  
+      .friend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+  
+        &.online .MuiAvatar-root {
+          border: 2px solid green;
+        }
+  
+        &.offline .MuiAvatar-root {
+          border: 2px solid gray;
+        }
+      }
+    }
+  }

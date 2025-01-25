@@ -9,6 +9,7 @@ import About from '../pages/About';
 import Matchmaking from '../pages/Matchmaking';
 import SearchResults from '../pages/SearchResults';
 import Research from '../pages/Research';
+import BuildCity from '../pages/BuildCity';
 
 const Router: React.FC = () => {
   return (
@@ -22,6 +23,7 @@ const Router: React.FC = () => {
       <Route path="/matchmaking" element={<Matchmaking />} />
       <Route path="/search" element={<SearchResults />} />
       <Route path="/research" element={<Research />} />
+      <Route path="/build-city" element={<BuildCity />} />
     </Routes>
   );
 };
