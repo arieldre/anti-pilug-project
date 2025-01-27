@@ -1,78 +1,200 @@
 .build-city {
-    padding: 0;
-    margin: 0;
-    background-color: #f4f7f6;
-    text-align: center;
-    height: 100vh; /* Full viewport height */
-    width: 100vw; /* Full viewport width */
+  padding: 0;
+  margin: 0;
+  background-color: #f4f7f6;
+  text-align: center;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .city-animation {
     display: flex;
     flex-direction: column;
     align-items: center;
-  
-    .city-animation {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%; /* Full width */
-      margin-top: 70px; /* Lower the content to sit below the navbar */
-      height: calc(100vh - 70px); /* Adjust height to exclude the navbar */
-    }
-  
-    .points-display {
-      margin-bottom: 10px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #333;
-    }
-  
-    .controls {
-      margin-bottom: 10px; /* Add spacing between points and buttons */
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      width: 100%; /* Full width */
-      max-width: 1200px;
-    }
-  
-    .city-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); /* Dynamic grid */
-      gap: 5px;
-      width: 100%; /* Full width */
-      height: calc(100vh - 180px); /* Adjust height for available space */
-      justify-content: center;
-      align-content: stretch; /* Stretch vertically */
-      overflow: hidden; /* Prevent scrolling */
-    }
-  
-    .city-block {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #f9f9f9;
-      font-size: 1.2rem;
-      border: 1px solid #ddd;
-      transition: transform 0.2s ease, background-color 0.2s ease;
-  
-      &.filled {
-        background-color: #3f51b5;
-        color: white;
-      }
-  
+    width: 100%; /* Full width */
+    margin-top: 70px; /* Lower the content to sit below the navbar */
+    height: calc(100vh - 70px); /* Adjust height to exclude the navbar */
+  }
+
+  .points-display {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Add space between points and upgrade button */
+
+    .upgrade-button {
+      background-color: #4caf50;
+      color: white;
+      padding: 5px 10px;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+
       &:hover {
-        transform: scale(1.05);
-        background-color: #e0f7fa;
+        background-color: #45a049;
+        transform: scale(1.1);
       }
-    }
-  
-    @media (max-width: 768px) {
-      .city-container {
-        grid-template-columns: repeat(5, 1fr); /* Adjust column count for smaller screens */
+
+      &:active {
+        transform: scale(0.95);
       }
-  
-      .city-block {
-        font-size: 1rem; /* Adjust block size for smaller screens */
+
+      &.disabled {
+        background-color: #bbb; /* Gray out if disabled */
+        cursor: not-allowed;
+        transform: none;
       }
     }
   }
-  
+
+  .controls {
+    margin-bottom: 10px; /* Add spacing between points and buttons */
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%; /* Full width */
+    max-width: 1200px;
+
+    button {
+      transition: transform 0.2s ease, background-color 0.2s ease; /* Button press and hover effects */
+    }
+
+    button:hover {
+      background-color: #3f51b5; /* Highlighted hover */
+      color: white;
+      transform: scale(1.1);
+    }
+
+    button:active {
+      transform: scale(0.95); /* Press effect */
+    }
+  }
+
+  .city-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); /* Dynamic grid */
+    gap: 5px;
+    width: 100%; /* Full width */
+    height: calc(100vh - 180px); /* Adjust height for available space */
+    justify-content: center;
+    align-content: stretch; /* Stretch vertically */
+    overflow: hidden; /* Prevent scrolling */
+  }
+
+  .city-block {
+    position: relative; /* Ensure proper positioning for pseudo-elements */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+    font-size: 1.5rem; /* Base font size for icons */
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.3s ease;
+
+    &.filled {
+      background-color: #3f51b5;
+      animation: popIn 0.4s ease-in-out; /* Smooth placement animation */
+      color: white;
+    }
+
+    &.selected {
+      border: 2px solid #ff9800; /* Highlight selected cell */
+      background-color: #ffe0b2;
+      animation: pulse 1.5s infinite; /* Subtle pulse animation for selected cell */
+    }
+
+    &.upgraded {
+      background-color: #4caf50; /* Green to show upgraded state */
+      font-size: 1.8rem; /* Slightly larger icon for upgraded blocks */
+    }
+
+    &:hover {
+      transform: scale(1.1); /* Slight scaling on hover */
+      background-color: #e0f7fa;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Fixed hover shading to avoid the right-side issue */
+    &:hover::before,
+    &:hover::after {
+      content: '';
+      position: absolute;
+      background-color: rgba(63, 81, 181, 0.1); /* Soft blue highlight */
+    }
+
+    &:hover::before {
+      height: 100%; /* Highlight row */
+      width: 100vw;
+      left: 0;
+    }
+
+    &:hover::after {
+      width: 100%; /* Highlight column */
+      height: 100vh;
+      top: 0;
+    }
+  }
+
+  /* Smooth placement animation */
+  @keyframes popIn {
+    from {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Pulse animation for selected cell */
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 5px #ff9800;
+    }
+    50% {
+      box-shadow: 0 0 15px #ff9800;
+    }
+    100% {
+      box-shadow: 0 0 5px #ff9800;
+    }
+  }
+
+  /* Fade-in animation for messages */
+  .message {
+    font-size: 1rem;
+    color: red;
+    margin-top: 10px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .city-container {
+      grid-template-columns: repeat(5, 1fr); /* Adjust column count for smaller screens */
+    }
+
+    .city-block {
+      font-size: 1.8rem; /* Adjust block size for smaller screens */
+    }
+
+    .city-block::after {
+      font-size: 2rem; /* Adjust icon size for smaller screens */
+    }
+  }
+}
