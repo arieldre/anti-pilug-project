@@ -3,8 +3,8 @@
   margin: 0;
   background-color: #f4f7f6;
   text-align: center;
-  height: 100vh; /* Full viewport height */
-  width: 100vw; /* Full viewport width */
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,9 +13,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%; /* Full width */
-    margin-top: 70px; /* Lower the content to sit below the navbar */
-    height: calc(100vh - 70px); /* Adjust height to exclude the navbar */
+    width: 100%;
+    margin-top: 70px;
+    height: calc(100vh - 70px);
   }
 
   .points-display {
@@ -25,7 +25,7 @@
     color: #333;
     display: flex;
     align-items: center;
-    gap: 15px; /* Add space between points and upgrade button */
+    gap: 15px;
 
     .upgrade-button {
       background-color: #4caf50;
@@ -39,6 +39,50 @@
 
       &:hover {
         background-color: #45a049;
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      &:disabled {
+        background-color: #bbb;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .timer-line {
+    width: 100%;
+    height: 8px;
+    margin: 10px 0;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+
+    .timer-progress {
+      height: 100%;
+      background-color: #4caf50;
+      transition: width 1s linear;
+    }
+  }
+
+  .controls {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 1200px;
+
+    button {
+      transition: transform 0.2s ease, background-color 0.2s ease;
+
+      &:hover {
+        background-color: #3f51b5;
+        color: white;
         transform: scale(1.1);
       }
 
@@ -46,155 +90,76 @@
         transform: scale(0.95);
       }
 
-      &.disabled {
-        background-color: #bbb; /* Gray out if disabled */
+      &:disabled {
+        background-color: #bbb !important;
         cursor: not-allowed;
-        transform: none;
       }
-    }
-  }
-
-  .controls {
-    margin-bottom: 10px; /* Add spacing between points and buttons */
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    width: 100%; /* Full width */
-    max-width: 1200px;
-
-    button {
-      transition: transform 0.2s ease, background-color 0.2s ease; /* Button press and hover effects */
-    }
-
-    button:hover {
-      background-color: #3f51b5; /* Highlighted hover */
-      color: white;
-      transform: scale(1.1);
-    }
-
-    button:active {
-      transform: scale(0.95); /* Press effect */
     }
   }
 
   .city-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); /* Dynamic grid */
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
     gap: 5px;
-    width: 100%; /* Full width */
-    height: calc(100vh - 180px); /* Adjust height for available space */
+    width: 100%;
+    height: calc(100vh - 180px);
     justify-content: center;
-    align-content: stretch; /* Stretch vertically */
-    overflow: hidden; /* Prevent scrolling */
+    align-content: stretch;
+    overflow: hidden;
   }
 
   .city-block {
-    position: relative; /* Ensure proper positioning for pseudo-elements */
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #f9f9f9;
-    font-size: 1.5rem; /* Base font size for icons */
+    font-size: 1.5rem;
     border: 1px solid #ddd;
     transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.3s ease;
 
     &.filled {
       background-color: #3f51b5;
-      animation: popIn 0.4s ease-in-out; /* Smooth placement animation */
       color: white;
     }
 
     &.selected {
-      border: 2px solid #ff9800; /* Highlight selected cell */
+      border: 2px solid #ff9800;
       background-color: #ffe0b2;
-      animation: pulse 1.5s infinite; /* Subtle pulse animation for selected cell */
     }
 
     &.upgraded {
-      background-color: #4caf50; /* Green to show upgraded state */
-      font-size: 1.8rem; /* Slightly larger icon for upgraded blocks */
-    }
-
-    &:hover {
-      transform: scale(1.1); /* Slight scaling on hover */
-      background-color: #e0f7fa;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Fixed hover shading to avoid the right-side issue */
-    &:hover::before,
-    &:hover::after {
-      content: '';
-      position: absolute;
-      background-color: rgba(63, 81, 181, 0.1); /* Soft blue highlight */
-    }
-
-    &:hover::before {
-      height: 100%; /* Highlight row */
-      width: 100vw;
-      left: 0;
-    }
-
-    &:hover::after {
-      width: 100%; /* Highlight column */
-      height: 100vh;
-      top: 0;
+      animation: upgrade-effect 0.5s ease-in-out;
     }
   }
 
-  /* Smooth placement animation */
-  @keyframes popIn {
-    from {
-      transform: scale(0.8);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  /* Pulse animation for selected cell */
-  @keyframes pulse {
+  @keyframes upgrade-effect {
     0% {
-      box-shadow: 0 0 5px #ff9800;
+      transform: scale(1);
+      background-color: #ffeb3b; // Yellow flash
     }
     50% {
-      box-shadow: 0 0 15px #ff9800;
+      transform: scale(1.2);
+      background-color: #4caf50; // Green transition
     }
     100% {
-      box-shadow: 0 0 5px #ff9800;
+      transform: scale(1);
+      background-color: #3f51b5; // Final color
     }
   }
 
-  /* Fade-in animation for messages */
-  .message {
-    font-size: 1rem;
-    color: red;
+  .upgrade-details {
     margin-top: 10px;
-    animation: fadeIn 0.3s ease;
-  }
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .city-container {
-      grid-template-columns: repeat(5, 1fr); /* Adjust column count for smaller screens */
-    }
-
-    .city-block {
-      font-size: 1.8rem; /* Adjust block size for smaller screens */
-    }
-
-    .city-block::after {
-      font-size: 2rem; /* Adjust icon size for smaller screens */
+    p {
+      margin: 5px 0;
+      font-size: 0.9rem;
+      color: #333;
     }
   }
 }
