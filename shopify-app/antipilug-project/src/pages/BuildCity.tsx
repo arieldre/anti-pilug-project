@@ -15,7 +15,26 @@ const BuildCity: React.FC = () => {
   const location = useLocation();
   const { level, points } = location.state || { level: 1, points: 0 };
 
-  const [city, setCity] = useState({
+  interface Building {
+    type: string;
+    emoji: string;
+    cost: number;
+    population: number;
+    position?: [number, number];
+    upgrade?: {
+      type: string;
+      emoji: string;
+      cost: number;
+      population: number;
+    };
+  }
+
+  const [city, setCity] = useState<{
+    level: number;
+    points: number;
+    buildings: Building[];
+    grid: string[][];
+  }>({
     level,
     points: Math.floor(points / 10), // Divide current points by 10
     buildings: [],
@@ -28,20 +47,21 @@ const BuildCity: React.FC = () => {
   const [message, setMessage] = useState("");
   const [population, setPopulation] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30); // Timer countdown
 
-  // Function to calculate total population from buildings
   const calculatePopulation = () =>
     city.buildings.reduce((acc, b) => acc + b.population, 0);
 
-  // Add population every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setPopulation((prev) => prev + calculatePopulation());
       setProgress(0);
+      setTimeLeft(30); // Reset timer
     }, 30000);
 
     const progressInterval = setInterval(() => {
-      setProgress((prev) => (prev < 100 ? prev + 3.33 : 100)); // Increase progress bar
+      setProgress((prev) => (prev < 100 ? prev + 3.33 : 100));
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
     return () => {
@@ -77,7 +97,7 @@ const BuildCity: React.FC = () => {
       buildings: [...city.buildings, { type: building.type, position: [row, col], population: building.population }],
     });
 
-    setSelectedCell(null); // Reset the selected cell
+    setSelectedCell(null);
     setMessage("");
   };
 
@@ -123,71 +143,55 @@ const BuildCity: React.FC = () => {
       buildings: newBuildings,
     });
 
-    // Trigger animation
-    const updatedCell = document.querySelector(
+    // Flash effect on upgrade
+    const upgradedCell = document.querySelector(
       `.city-block[data-row="${row}"][data-col="${col}"]`
     );
-    if (updatedCell) updatedCell.classList.add("upgraded");
-    setTimeout(() => updatedCell?.classList.remove("upgraded"), 500);
+    if (upgradedCell) upgradedCell.classList.add("upgraded");
+    setTimeout(() => upgradedCell?.classList.remove("upgraded"), 600);
 
     setSelectedCell(null);
     setMessage("");
   };
 
-  const totalPopulation = population + calculatePopulation();
-
   return (
     <div className="build-city">
       <Box className="city-animation">
-        {/* Points and Population Display */}
         <Box className="points-display">
           <Typography variant="h6">Current Points: {city.points}</Typography>
-          <Typography variant="h6">Estimated Population: {totalPopulation}</Typography>
+          <Typography variant="h6">Estimated Population: {population + calculatePopulation()}</Typography>
         </Box>
 
-        {/* Timer Progress Bar */}
+        {/* Timer Progress Bar with Countdown */}
         <Box className="timer-line">
-          <Box className="timer-progress" style={{ width: `${progress}%` }}></Box>
+          <Box className="timer-progress" style={{ width: `${progress}%` }}>
+            <Typography className="timer-text">{timeLeft}s</Typography>
+          </Box>
         </Box>
 
         {/* Controls */}
         <Box className="controls">
-          {buildings
-            .sort((a, b) => a.cost - b.cost) // Sort buttons by cost
-            .map((building) => (
-              <Tooltip
-                key={building.type}
-                title={`Cost: ${building.cost} | Population: +${building.population}`}
-                arrow
+          {buildings.map((building) => (
+            <Tooltip key={building.type} title={`Cost: ${building.cost} | Population: +${building.population}`} arrow>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={city.points < building.cost}
+                onClick={() => placeBuilding(building)}
               >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={city.points < building.cost}
-                  onClick={() => placeBuilding(building)}
-                >
-                  Build {building.type} ({building.cost} points)
-                </Button>
-              </Tooltip>
-            ))}
+                Build {building.type} ({building.cost} points)
+              </Button>
+            </Tooltip>
+          ))}
         </Box>
 
-        {/* Error/Info Message */}
         {message && <Typography variant="body2" color="error">{message}</Typography>}
 
-        {/* Selected Cell Details */}
+        {/* Upgrade Button */}
         {selectedCell && city.grid[selectedCell[0]][selectedCell[1]] !== "⬜" && (
-          <Button
-            className="upgrade-button"
-            onClick={upgradeBuilding}
-            disabled={
-              city.points <
-              buildings.find((b) => b.emoji === city.grid[selectedCell[0]][selectedCell[1]])?.upgrade?.cost
-            }
-          >
+          <Button className="upgrade-button" onClick={upgradeBuilding}>
             Upgrade (
-            {buildings.find((b) => b.emoji === city.grid[selectedCell[0]][selectedCell[1]])?.upgrade?.cost || 0}{" "}
-            points)
+            {buildings.find((b) => b.emoji === city.grid[selectedCell[0]][selectedCell[1]])?.upgrade?.cost || 0} points)
           </Button>
         )}
 
@@ -202,7 +206,7 @@ const BuildCity: React.FC = () => {
                 className={`city-block ${cell !== "⬜" ? "filled" : ""} ${
                   selectedCell?.[0] === i && selectedCell?.[1] === j ? "selected" : ""
                 }`}
-                onClick={() => setSelectedCell([i, j])} // Set the selected cell
+                onClick={() => setSelectedCell([i, j])}
               >
                 {cell}
               </Box>
