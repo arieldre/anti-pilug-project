@@ -24,7 +24,7 @@ const Navbar: React.FC = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <Button color="inherit" component={Link} to="/">Home</Button>
           <Button color="inherit" component={Link} to="/videos">Videos</Button>
-          <Button color="inherit" component={Link} to="/courses">Courses</Button>
+          <Button color="inherit" component={Link} to="/shop">Shop</Button> {/* Replace Courses with Shop */}
           <Button color="inherit" component={Link} to="/profile">Profile</Button>
           <Button color="inherit" component={Link} to="/help-center">Help Center</Button>
           <Button color="inherit" component={Link} to="/about">About</Button>

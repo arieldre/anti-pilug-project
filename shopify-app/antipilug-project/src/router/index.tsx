@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home';
 import Videos from '../pages/Videos';
-import Courses from '../pages/Courses';
+import Shop from '../pages/Shop'; // Import Shop page
 import Profile from '../pages/Profile';
 import HelpCenter from '../pages/HelpCenter';
 import About from '../pages/About';
@@ -16,7 +16,7 @@ const Router: React.FC = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/videos" element={<Videos />} />
-      <Route path="/courses" element={<Courses />} />
+      <Route path="/shop" element={<Shop />} /> {/* Replace Courses with Shop */}
       <Route path="/profile" element={<Profile />} />
       <Route path="/help-center" element={<HelpCenter />} />
       <Route path="/about" element={<About />} />
