@@ -1,122 +1,66 @@
 .build-city {
   padding: 0;
   margin: 0;
-  background-color: #f4f7f6;
+  background: linear-gradient(135deg, #1a2b3c 0%, #2c3e50 100%);
   text-align: center;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding-top: 70px; /* Push content below navbar */
 
-  .city-animation {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  // Game Header (Points & Population)
+  .game-header {
+    position: fixed;
+    top: 60px;
+    left: 0;
     width: 100%;
-    margin-top: 70px;
-    height: calc(100vh - 70px);
-  }
-
-  .points-display {
-    margin-bottom: 10px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 999;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    padding: 15px;
   }
 
-  .upgrade-button {
-    background-color: #4caf50;
-    color: white;
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-      background-color: #45a049;
-      transform: scale(1.05);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    &:disabled {
-      background-color: #bbb;
-      cursor: not-allowed;
-    }
-  }
-
-  .timer-line {
-    width: 100%;
-    height: 8px;
-    margin: 10px 0;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    overflow: hidden;
-    position: relative;
-
-    .timer-progress {
-      height: 100%;
-      background-color: #4caf50;
-      transition: width 1s linear;
+  .resources {
+    display: flex;
+    gap: 20px;
+    
+    .resource {
       display: flex;
-      justify-content: center;
       align-items: center;
-      position: relative;
-    }
+      gap: 8px;
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      color: #fff;
+      font-weight: 600;
 
-    .timer-text {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: white;
-      position: absolute;
-    }
-  }
-
-  .controls {
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
-    max-width: 1200px;
-
-    button {
-      transition: transform 0.2s ease, background-color 0.2s ease;
-
-      &:hover {
-        background-color: #3f51b5;
-        color: white;
-        transform: scale(1.1);
-      }
-
-      &:active {
-        transform: scale(0.95);
-      }
-
-      &:disabled {
-        background-color: #bbb !important;
-        cursor: not-allowed;
+      .icon {
+        font-size: 1.2rem;
+        animation: pulse 2s infinite;
       }
     }
   }
 
+  // City Grid
   .city-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-    gap: 5px;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 10px;
     width: 100%;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 220px);
     justify-content: center;
-    align-content: stretch;
-    overflow: hidden;
+    align-content: start;
+    overflow-y: auto;
+    padding: 20px;
   }
 
   .city-block {
@@ -124,38 +68,62 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f9f9f9;
+    background: rgba(255, 255, 255, 0.1);
     font-size: 1.5rem;
-    border: 1px solid #ddd;
-    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.3s ease;
-
-    &.filled {
-      background-color: #3f51b5;
-      color: white;
-    }
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
 
     &.selected {
-      border: 2px solid #ff9800;
-      background-color: #ffe0b2;
-    }
-
-    &.upgraded {
-      animation: upgrade-flash 0.6s ease-in-out;
+      border: 3px solid #ffd700;
+      background: linear-gradient(135deg, #fff176, #ffd54f);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      transform: scale(1.1);
     }
   }
 
-  @keyframes upgrade-flash {
-    0% {
-      background-color: #ffeb3b; // Yellow flash
-      transform: scale(1);
+  // Selected Building Info Panel
+  .selected-building {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: none; /* Initially hidden */
+
+    &.visible {
+      display: block;
     }
-    50% {
-      background-color: #4caf50; // Green transition
-      transform: scale(1.2);
+
+    .building-name {
+      font-size: 1.5rem;
+      font-weight: bold;
     }
-    100% {
-      background-color: #3f51b5; // Final color
-      transform: scale(1);
+
+    .building-level {
+      font-size: 1.1rem;
+      margin-top: 5px;
+      color: #ffd700;
     }
+
+    .building-production {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #4caf50;
+    }
+  }
+
+  // Animations
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
   }
 }
