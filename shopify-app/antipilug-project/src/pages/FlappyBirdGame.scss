@@ -9,11 +9,93 @@
   .game-container {
     position: relative;
     margin: 0 auto;
-    background: linear-gradient(180deg, #64b5f6 0%, #1976d2 100%);
+    background: linear-gradient(180deg, #87CEEB 0%, #1E90FF 100%);
     overflow: hidden;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.flash {
+      animation: flash 0.1s linear;
+    }
+
+    .bird {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      left: 50px;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      border-radius: 50% 60% 40% 40%;
+      transform-origin: center;
+      transition: transform 0.1s ease;
+      z-index: 3;
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3);
+      animation: hover 0.8s infinite alternate ease-in-out;
+
+      // Feather details
+      &::before {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 16px;
+        background: linear-gradient(90deg, #FFA500 0%, #FF8C00 100%);
+        border-radius: 60% 40% 40% 60%;
+        top: 14px;
+        left: -6px;
+        transform-origin: right center;
+        animation: flapWing 0.2s infinite alternate ease-in-out;
+        box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      // Tail feathers
+      &::after {
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 12px;
+        background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+        border-radius: 0 50% 50% 0;
+        right: -8px;
+        top: 15px;
+        transform: rotate(-10deg);
+      }
+
+      .eye {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: linear-gradient(45deg, #2C3E50, #34495E);
+        border-radius: 50%;
+        top: 12px;
+        right: 8px;
+        border: 1px solid #1a2835;
+
+        &::after {
+          content: '';
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: white;
+          border-radius: 50%;
+          top: 1px;
+          right: 1px;
+          box-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+        }
+      }
+
+      .beak {
+        position: absolute;
+        width: 15px;
+        height: 10px;
+        background: linear-gradient(45deg, #E67E22 0%, #D35400 100%);
+        border-radius: 50% 50% 30% 30%;
+        top: 15px;
+        right: -5px;
+        transform: rotate(-10deg);
+        box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.1);
+      }
+    }
 
     .cloud {
       position: absolute;
@@ -22,14 +104,16 @@
       pointer-events: none;
       transition: left 0.016s linear;
       z-index: 1;
-      animation: floatCloud 3s infinite ease-in-out;
-      
-      &::before,
-      &::after {
+      animation: float 3s infinite ease-in-out;
+      filter: blur(2px);
+      opacity: 0.9;
+
+      &::before, &::after {
         content: '';
         position: absolute;
-        background: rgba(255, 255, 255, 0.9);
+        background: inherit;
         border-radius: 50%;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
       }
 
       &::before {
@@ -45,138 +129,83 @@
         top: -30%;
         right: 20%;
       }
-
-      &.cloud-small {
-        opacity: 0.7;
-        transform: scale(0.8);
-        animation-duration: 2.5s;
-      }
-
-      &.cloud-medium {
-        opacity: 0.8;
-        transform: scale(1);
-        animation-duration: 3s;
-      }
-
-      &.cloud-large {
-        opacity: 0.9;
-        transform: scale(1.2);
-        animation-duration: 3.5s;
-      }
-    }
-
-    .bird {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      left: 50px;
-      background: #f1c40f;
-      border-radius: 50% 60% 40% 40%;
-      transform-origin: center;
-      transition: transform 0.1s ease;
-      z-index: 2;
-      animation: hover 0.8s infinite alternate ease-in-out;
-
-      &::before {
-        content: '';
-        position: absolute;
-        width: 20px;
-        height: 15px;
-        background: #f39c12;
-        border-radius: 50%;
-        top: 15px;
-        left: -5px;
-        transform-origin: right center;
-        animation: flapWing 0.2s infinite alternate;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        width: 15px;
-        height: 12px;
-        background: #f39c12;
-        border-radius: 0 50% 50% 0;
-        right: -10px;
-        top: 15px;
-      }
-
-      .beak {
-        position: absolute;
-        width: 15px;
-        height: 10px;
-        background: #e67e22;
-        border-radius: 50% 50% 30% 30%;
-        top: 15px;
-        right: -5px;
-        transform: rotate(-10deg);
-      }
-
-      .eye {
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        background: #2c3e50;
-        border-radius: 50%;
-        top: 12px;
-        right: 8px;
-
-        &::after {
-          content: '';
-          position: absolute;
-          width: 3px;
-          height: 3px;
-          background: white;
-          border-radius: 50%;
-          top: 1px;
-          right: 1px;
-        }
-      }
     }
 
     .pipes {
       .pipe {
         position: absolute;
         width: 60px;
-        background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
-        border: 3px solid #219a52;
+        background: linear-gradient(90deg, #228B22 0%, #32CD32 100%);
+        border: 4px solid #006400;
         box-sizing: border-box;
-        border-radius: 4px;
-        transition: left 0.016s linear;
+        transition: all 0.016s linear;
+
+        // Pipe texture
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: 
+            linear-gradient(90deg, 
+              transparent 0%, 
+              rgba(255,255,255,0.1) 50%,
+              transparent 100%);
+        }
 
         &.top {
           top: 0;
           border-bottom: none;
+          border-radius: 0 0 4px 4px;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: -8px;
+            right: -8px;
+            height: 12px;
+            background: #006400;
+            border-radius: 6px;
+          }
         }
 
         &.bottom {
           bottom: 0;
           border-top: none;
+          border-radius: 4px 4px 0 0;
           box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -8px;
+            right: -8px;
+            height: 12px;
+            background: #006400;
+            border-radius: 6px;
+          }
         }
       }
     }
 
-    .score, .level {
+    .score, .high-score, .level {
       position: absolute;
       color: white;
       font-size: 24px;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-      z-index: 3;
+      z-index: 4;
       padding: 10px;
     }
 
-    .score {
-      top: 20px;
-      left: 20px;
-    }
-
-    .level {
-      top: 50px;
-      left: 20px;
-    }
+    .score { top: 20px; left: 20px; }
+    .high-score { top: 20px; right: 20px; }
+    .level { top: 50px; left: 20px; }
 
     .message {
       position: absolute;
@@ -185,46 +214,63 @@
       transform: translate(-50%, -50%);
       color: white;
       font-size: 24px;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       text-align: center;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       background: rgba(0, 0, 0, 0.7);
       padding: 20px;
       border-radius: 10px;
       pointer-events: none;
-      z-index: 4;
+      z-index: 5;
       line-height: 1.5;
+    }
+
+    .pause-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(3px);
     }
   }
 }
 
-@keyframes flapWing {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(30deg);
-  }
+@keyframes flash {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(2); }
+  100% { filter: brightness(1); }
 }
 
 @keyframes hover {
-  from {
-    transform: translateY(-3px);
+  0% { transform: translateY(-2px) rotate(var(--rotation)); }
+  100% { transform: translateY(2px) rotate(var(--rotation)); }
+}
+
+@keyframes flapWing {
+  0% { 
+    transform: rotate(0deg) scaleY(1);
+    filter: brightness(1);
   }
-  to {
-    transform: translateY(3px);
+  100% { 
+    transform: rotate(-25deg) scaleY(0.8);
+    filter: brightness(1.2);
   }
 }
 
-@keyframes floatCloud {
-  0% {
-    transform: translateY(0);
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+    filter: blur(2px);
   }
-  50% {
-    transform: translateY(-5px);
-  }
-  100% {
-    transform: translateY(0);
+  50% { 
+    transform: translateY(-6px) rotate(1deg);
+    filter: blur(1.5px);
   }
 }
 
@@ -240,10 +286,15 @@
         font-size: 20px;
         padding: 15px;
       }
+    }
+  }
+}
 
-      .cloud {
-        opacity: 0.6;
-      }
+@media (hover: hover) {
+  .game-container {
+    &:hover {
+      transform: scale(1.01);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     }
   }
 }
