@@ -5,19 +5,82 @@
   min-height: 100vh;
   background: #121212;
   padding: 20px;
+  will-change: transform;
 
   .game-container {
     position: relative;
     margin: 0 auto;
-    background: linear-gradient(180deg, #87CEEB 0%, #1E90FF 100%);
+    background: linear-gradient(180deg, 
+      #87CEEB 0%, 
+      #64b5f6 50%,
+      #1E90FF 100%
+    );
     overflow: hidden;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     transition: all 0.3s ease;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+
+    // Sun/Moon effect
+    &::before {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, 
+        rgba(255, 236, 179, 0.9) 0%,
+        rgba(255, 236, 179, 0.2) 70%,
+        transparent 100%
+      );
+      top: 40px;
+      right: 60px;
+      border-radius: 50%;
+      filter: blur(2px);
+      animation: glow 4s infinite alternate ease-in-out;
+      z-index: 1;
+    }
+
+    // Background particles
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 30px 30px, 15px 15px;
+      animation: particleFloat 20s linear infinite;
+      opacity: 0.3;
+      pointer-events: none;
+    }
 
     &.flash {
       animation: flash 0.1s linear;
+    }
+
+    // Background birds
+    .bg-bird {
+      position: absolute;
+      width: 20px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      clip-path: polygon(0% 50%, 50% 0%, 60% 50%, 50% 100%);
+      animation: flyAcross 15s linear infinite;
+      z-index: 1;
+
+      @for $i from 1 through 5 {
+        &:nth-child(#{$i}) {
+          top: #{random(60)}vh;
+          animation-delay: #{random(5)}s;
+          animation-duration: #{15 + random(10)}s;
+          transform: scale(#{0.8 + random() * 0.4});
+          opacity: #{0.4 + random() * 0.3};
+        }
+      }
     }
 
     .bird {
@@ -32,8 +95,9 @@
       z-index: 3;
       box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3);
       animation: hover 0.8s infinite alternate ease-in-out;
+      will-change: transform;
 
-      // Feather details
+      // Wing
       &::before {
         content: '';
         position: absolute;
@@ -46,9 +110,11 @@
         transform-origin: right center;
         animation: flapWing 0.2s infinite alternate ease-in-out;
         box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.2);
+        will-change: transform;
+        filter: drop-shadow(0 0 5px rgba(255, 165, 0, 0.3));
       }
 
-      // Tail feathers
+      // Tail
       &::after {
         content: '';
         position: absolute;
@@ -65,7 +131,7 @@
         position: absolute;
         width: 10px;
         height: 10px;
-        background: linear-gradient(45deg, #2C3E50, #34495E);
+        background: radial-gradient(circle at 30% 30%, #2C3E50, #34495E);
         border-radius: 50%;
         top: 12px;
         right: 8px;
@@ -102,11 +168,12 @@
       background: rgba(255, 255, 255, 0.9);
       border-radius: 20px;
       pointer-events: none;
-      transition: left 0.016s linear;
+      transition: transform 0.016s linear;
       z-index: 1;
       animation: float 3s infinite ease-in-out;
       filter: blur(2px);
       opacity: 0.9;
+      will-change: transform;
 
       &::before, &::after {
         content: '';
@@ -135,12 +202,16 @@
       .pipe {
         position: absolute;
         width: 60px;
-        background: linear-gradient(90deg, #228B22 0%, #32CD32 100%);
+        background: linear-gradient(90deg, 
+          #228B22 0%, 
+          #32CD32 50%,
+          #228B22 100%
+        );
         border: 4px solid #006400;
         box-sizing: border-box;
-        transition: all 0.016s linear;
+        transition: transform 0.016s linear;
+        will-change: transform;
 
-        // Pipe texture
         &::before {
           content: '';
           position: absolute;
@@ -148,11 +219,12 @@
           left: 0;
           right: 0;
           bottom: 0;
-          background: 
-            linear-gradient(90deg, 
-              transparent 0%, 
-              rgba(255,255,255,0.1) 50%,
-              transparent 100%);
+          background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255,255,255,0.1) 50%,
+            transparent 100%
+          );
+          animation: pipeShine 2s linear infinite;
         }
 
         &.top {
@@ -223,6 +295,7 @@
       pointer-events: none;
       z-index: 5;
       line-height: 1.5;
+      backdrop-filter: blur(3px);
     }
 
     .pause-overlay {
@@ -237,6 +310,7 @@
       justify-content: center;
       align-items: center;
       backdrop-filter: blur(3px);
+      transition: opacity 0.3s ease;
     }
   }
 }
@@ -248,14 +322,24 @@
 }
 
 @keyframes hover {
-  0% { transform: translateY(-2px) rotate(var(--rotation)); }
-  100% { transform: translateY(2px) rotate(var(--rotation)); }
+  0% { 
+    transform: translateY(-2px) rotate(var(--rotation));
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+  }
+  100% { 
+    transform: translateY(2px) rotate(var(--rotation));
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+  }
 }
 
 @keyframes flapWing {
   0% { 
     transform: rotate(0deg) scaleY(1);
     filter: brightness(1);
+  }
+  50% {
+    transform: rotate(-15deg) scaleY(0.9);
+    filter: brightness(1.1);
   }
   100% { 
     transform: rotate(-25deg) scaleY(0.8);
@@ -265,12 +349,49 @@
 
 @keyframes float {
   0%, 100% { 
-    transform: translateY(0) rotate(0deg);
+    transform: translateY(0);
     filter: blur(2px);
   }
   50% { 
-    transform: translateY(-6px) rotate(1deg);
+    transform: translateY(-6px);
     filter: blur(1.5px);
+  }
+}
+
+@keyframes pipeShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes glow {
+  0% { 
+    transform: scale(1);
+    filter: blur(2px);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(1.1);
+    filter: blur(3px);
+    opacity: 1;
+  }
+}
+
+@keyframes particleFloat {
+  0% { background-position: 0 0; }
+  100% { background-position: 100px 100px; }
+}
+
+@keyframes flyAcross {
+  0% {
+    left: -20px;
+    transform: translateY(0) scaleX(1);
+  }
+  50% {
+    transform: translateY(20px) scaleX(1);
+  }
+  100% {
+    left: calc(100% + 20px);
+    transform: translateY(0) scaleX(1);
   }
 }
 
@@ -293,7 +414,7 @@
 @media (hover: hover) {
   .game-container {
     &:hover {
-      transform: scale(1.01);
+      transform: scale(1.01) translateZ(0);
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     }
   }
