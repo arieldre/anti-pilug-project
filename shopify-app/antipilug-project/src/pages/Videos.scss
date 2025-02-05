@@ -1,0 +1,205 @@
+.videos-page {
+  padding: 24px;
+  padding-top: 88px; // Account for navbar
+  background-color: #fff;
+  min-height: 100vh;
+  
+  .filters-section {
+    margin-bottom: 32px;
+    
+    .search-field {
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 24px;
+      
+      .MuiOutlinedInput-root {
+        border-radius: 12px;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background-color: #f0f1f2;
+        }
+        
+        &.Mui-focused {
+          background-color: #fff;
+          box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+      }
+    }
+    
+    .filters-container {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      
+      .filter-control {
+        min-width: 180px;
+        flex-grow: 1;
+        max-width: 250px;
+        
+        .MuiOutlinedInput-root {
+          border-radius: 12px;
+          background-color: #f8f9fa;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            background-color: #f0f1f2;
+          }
+          
+          &.Mui-focused {
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+          }
+        }
+        
+        .MuiSelect-select {
+          padding: 12px 14px;
+        }
+        
+        .MuiInputLabel-root {
+          &.Mui-focused {
+            color: #1976d2;
+          }
+        }
+      }
+    }
+  }
+  
+  .videos-grid {
+    .video-card {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: none;
+      border: 1px solid #eee;
+      transition: all 0.3s ease;
+      background-color: #fff;
+      cursor: pointer;
+      
+      &:hover {
+        transform: translateY(-4px);
+      }
+      
+      .video-thumbnail {
+        position: relative;
+        height: 180px;
+        background-size: cover;
+        
+        .video-duration {
+          position: absolute;
+          bottom: 8px;
+          right: 8px;
+          background: rgba(0, 0, 0, 0.75);
+          color: white;
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+      }
+      
+      .video-title {
+        margin: 8px 0;
+        font-weight: 500;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      
+      .video-tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 12px 0;
+        
+        .tag-chip {
+          border-radius: 8px;
+          background-color: #f0f7ff;
+          color: #1976d2;
+          font-weight: 500;
+          
+          &:hover {
+            background-color: #e3f2fd;
+          }
+        }
+      }
+      
+      .video-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 12px;
+        
+        .MuiIconButton-root {
+          color: #666;
+          padding: 8px;
+          
+          &:hover {
+            color: #1976d2;
+            background-color: #f0f7ff;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Header styling to match HelpCenter
+.videos-page {
+  .header {
+    margin-bottom: 32px;
+    text-align: center;
+    
+    .title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+    
+    .subtitle {
+      color: #666;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .videos-page {
+    padding: 16px;
+    
+    .header {
+      .title {
+        font-size: 2rem;
+      }
+    }
+    
+    .filters-section {
+      .filters-container {
+        flex-direction: column;
+        
+        .filter-control {
+          width: 100%;
+          max-width: none;
+        }
+      }
+    }
+  }
+}
+
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+  width: 100%;
+}
+
+// Add loading styles
+.MuiCircularProgress-root {
+  color: #1976d2;
+} 

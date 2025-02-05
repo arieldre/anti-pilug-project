@@ -1,0 +1,143 @@
+.video-page-wrapper {
+  padding-top: 64px;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.video-page {
+  padding: 24px;
+  background-color: #fff;
+  
+  .video-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  
+  .video-title {
+    margin-bottom: 12px;
+  }
+  
+  .video-info {
+    margin-bottom: 24px;
+    
+    .video-tags {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      
+      .tag-chip {
+        background-color: #f0f7ff;
+        color: #1976d2;
+      }
+    }
+  }
+  
+  .comments-section {
+    .comments-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .comment-input {
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    
+    .comments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      
+      .comment-card {
+        .comment-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 8px;
+          
+          .user-info {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            
+            .level-chip {
+              background-color: #f0f7ff;
+              color: #1976d2;
+              margin-top: 4px;
+            }
+          }
+        }
+        
+        .comment-actions {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          margin-top: 8px;
+        }
+      }
+    }
+  }
+  
+  .related-videos {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .related-video-card {
+      display: flex;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      background: #fff;
+      border: 1px solid #eee;
+      box-shadow: none !important;
+      border-radius: 8px;
+      
+      &:hover {
+        transform: translateY(-2px);
+      }
+      
+      .MuiCardContent-root {
+        background: #fff;
+        box-shadow: none !important;
+      }
+      
+      img {
+        width: 168px;
+        height: 94px;
+        object-fit: cover;
+      }
+      
+      .MuiCardContent-root {
+        padding: 8px;
+        flex: 1;
+      }
+    }
+  }
+
+  .comment-card {
+    border: 1px solid #eee;
+    background: #fff;
+  }
+}
+
+.MuiPaper-elevation1,
+.MuiPaper-elevation2,
+.MuiPaper-elevation3,
+.MuiPaper-elevation4 {
+  box-shadow: none !important;
+} 

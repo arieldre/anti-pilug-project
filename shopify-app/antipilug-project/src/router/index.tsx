@@ -11,6 +11,7 @@ import SearchResults from '../pages/SearchResults';
 import Research from '../pages/Research';
 import BuildCity from '../pages/BuildCity';
 import FlappyBirdGame from '../pages/FlappyBirdGame'; // Import FlappyBirdGame page
+import VideoPage from '../pages/VideoPage';
 
 const Router: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const Router: React.FC = () => {
       <Route path="/matchmaking" element={<Matchmaking />} />
       <Route path="/search" element={<SearchResults />} />
       <Route path="/research" element={<Research />} />
+      <Route path="/video/:id" element={<VideoPage/>} />
       <Route path="/build-city" element={<BuildCity />} />
       <Route path="/flappy-bird-game" element={<FlappyBirdGame />} /> {/* Add FlappyBirdGame route */}
     </Routes>
