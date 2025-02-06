@@ -1,129 +1,192 @@
-.build-city {
-  padding: 0;
-  margin: 0;
-  background: linear-gradient(135deg, #1a2b3c 0%, #2c3e50 100%);
-  text-align: center;
+/* BuildCity.scss */
+.build-city-game {
+  background: linear-gradient(135deg, #74ebd5, #ACB6E5);
   min-height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  position: relative;
-  overflow: hidden;
-  padding-top: 70px; /* Push content below navbar */
-
-  // Game Header (Points & Population)
+  padding: 20px;
+  color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
   .game-header {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-  }
-
-  .resources {
-    display: flex;
-    gap: 20px;
+    text-align: center;
+    margin-bottom: 20px;
     
-    .resource {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 15px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
+    h1 {
+      font-size: 3rem;
       color: #fff;
-      font-weight: 600;
-
-      .icon {
-        font-size: 1.2rem;
-        animation: pulse 2s infinite;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+  }
+  
+  .stats-panel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    
+    .stat {
+      margin: 10px;
+      font-size: 1.2rem;
+      
+      .label {
+        font-weight: bold;
+        margin-right: 5px;
+      }
+      
+      .value {
+        color: #2c3e50;
       }
     }
   }
-
-  // City Grid
-  .city-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-    gap: 10px;
-    width: 100%;
-    height: calc(100vh - 220px);
-    justify-content: center;
-    align-content: start;
-    overflow-y: auto;
-    padding: 20px;
-  }
-
-  .city-block {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    font-size: 1.5rem;
-    border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
-
-    &.selected {
-      border: 3px solid #ffd700;
-      background: linear-gradient(135deg, #fff176, #ffd54f);
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-      transform: scale(1.1);
-    }
-  }
-
-  // Selected Building Info Panel
-  .selected-building {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 15px;
-    border-radius: 12px;
+  
+  .tap-section {
     text-align: center;
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    display: none; /* Initially hidden */
-
-    &.visible {
-      display: block;
+    margin-bottom: 30px;
+    
+    button {
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.3s;
     }
-
-    .building-name {
-      font-size: 1.5rem;
-      font-weight: bold;
+    
+    .tap-button {
+      background: #27ae60;
+      color: #fff;
     }
-
-    .building-level {
-      font-size: 1.1rem;
-      margin-top: 5px;
-      color: #ffd700;
+    
+    .tap-button:active {
+      transform: scale(0.95);
     }
-
-    .building-production {
-      font-size: 1rem;
-      margin-top: 10px;
-      color: #4caf50;
+    
+    .upgrade-tap-button {
+      background: #2980b9;
+      color: #fff;
+    }
+    
+    .upgrade-tap-button:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+    }
+    
+    .reset-button {
+      background: #c0392b;
+      color: #fff;
     }
   }
-
-  // Animations
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+  
+  .achievements-section {
+    background: rgba(255,255,255,0.9);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    
+    h2 {
+      margin-bottom: 10px;
+    }
+    
+    ul {
+      list-style-type: none;
+      padding: 0;
+      
+      li {
+        background: #f1c40f;
+        padding: 8px 12px;
+        border-radius: 5px;
+        margin: 5px 0;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+    }
+    
+    p {
+      font-size: 1rem;
+      color: #555;
+    }
+  }
+  
+  .buildings-section {
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .buildings-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      
+      .building-card {
+        background: rgba(255,255,255,0.95);
+        border: 2px solid #ecf0f1;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px;
+        width: 220px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        
+        h3 {
+          margin-top: 0;
+          margin-bottom: 10px;
+          color: #34495e;
+        }
+        
+        p {
+          margin: 8px 0;
+          font-size: 1rem;
+          color: #2c3e50;
+        }
+        
+        button {
+          margin: 5px 0;
+          padding: 8px 12px;
+          font-size: 0.9rem;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
+        
+        button:first-of-type {
+          background: #8e44ad;
+          color: #fff;
+        }
+        
+        button:first-of-type:disabled {
+          background: #bdc3c7;
+          cursor: not-allowed;
+        }
+        
+        button:last-of-type {
+          background: #d35400;
+          color: #fff;
+        }
+        
+        button:last-of-type:disabled {
+          background: #bdc3c7;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .stats-panel {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .buildings-list {
+      flex-direction: column;
+      align-items: center;
+    }
   }
 }

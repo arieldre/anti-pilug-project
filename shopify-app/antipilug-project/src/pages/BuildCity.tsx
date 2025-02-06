@@ -1,219 +1,223 @@
-import React, { useState, useEffect } from "react";
-import { Typography, Box, Button, Tooltip } from "@mui/material";
-import { useLocation } from "react-router-dom";
-import "./BuildCity.scss";
+import React, { useState, useEffect } from 'react';
+import './BuildCity.scss';
 
-const buildings = [
-  { type: "Farm", emoji: "🌾", cost: 2, population: 1, upgrade: { type: "Computer Farm", emoji: "🤖", cost: 4, population: 2 } },
-  { type: "Market", emoji: "🛒", cost: 5, population: 3, upgrade: { type: "Supermarket", emoji: "🏬", cost: 7, population: 5 } },
-  { type: "House", emoji: "🏠", cost: 4, population: 4, upgrade: { type: "Villa", emoji: "🏡", cost: 6, population: 6 } },
-  { type: "Townhall", emoji: "🏛️", cost: 7, population: 5, upgrade: { type: "Capitol", emoji: "🏤", cost: 9, population: 7 } },
-  { type: "Synagogue", emoji: "🕍", cost: 8, population: 6, upgrade: { type: "Temple", emoji: "⛪", cost: 10, population: 8 } },
+interface Building {
+  id: number;
+  name: string;
+  baseCost: number;
+  level: number;
+  baseIncome: number;
+  efficiencyMultiplier: number;
+  nextBigUpgradeIndex: number; // index into thresholds
+}
+
+const thresholds = [10, 25, 50, 100];
+
+const initialBuildings: Building[] = [
+  { id: 1, name: "Farm", baseCost: 50, level: 0, baseIncome: 1, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 2, name: "Bakery", baseCost: 150, level: 0, baseIncome: 3, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 3, name: "House", baseCost: 500, level: 0, baseIncome: 10, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 4, name: "School", baseCost: 1200, level: 0, baseIncome: 25, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 5, name: "Library", baseCost: 3000, level: 0, baseIncome: 50, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 6, name: "Hospital", baseCost: 8000, level: 0, baseIncome: 100, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 7, name: "Park", baseCost: 20000, level: 0, baseIncome: 200, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 8, name: "Museum", baseCost: 50000, level: 0, baseIncome: 500, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 9, name: "Skyscraper", baseCost: 120000, level: 0, baseIncome: 1000, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
+  { id: 10, name: "Stadium", baseCost: 300000, level: 0, baseIncome: 2500, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 },
 ];
 
 const BuildCity: React.FC = () => {
-  const location = useLocation();
-  const { level, points } = location.state || { level: 1, points: 0 };
+  // Core game state
+  const [money, setMoney] = useState(0);
+  const [tapValue, setTapValue] = useState(1);
+  const [tapUpgradeCost, setTapUpgradeCost] = useState(50);
+  const [totalTaps, setTotalTaps] = useState(0);
+  const [buildings, setBuildings] = useState<Building[]>(initialBuildings);
+  const [achievements, setAchievements] = useState<string[]>([]);
 
-  interface Building {
-    type: string;
-    emoji: string;
-    cost: number;
-    population: number;
-    position?: [number, number];
-    upgrade?: {
-      type: string;
-      emoji: string;
-      cost: number;
-      population: number;
-    };
-  }
+  // Derived stats
+  const totalBuildingLevels = buildings.reduce((acc, b) => acc + b.level, 0);
+  const totalIncome = buildings.reduce((acc, b) => acc + (b.level * b.baseIncome * b.efficiencyMultiplier), 0);
 
-  const [city, setCity] = useState<{
-    level: number;
-    points: number;
-    buildings: Building[];
-    grid: string[][];
-  }>({
-    level,
-    points: Math.floor(points / 10), // Divide current points by 10
-    buildings: [],
-    grid: Array(9) // 9 rows
-      .fill(null)
-      .map(() => Array(10).fill("⬜")), // 10 columns
-  });
-
-  const [selectedCell, setSelectedCell] = useState<[number, number] | null>(null);
-  const [message, setMessage] = useState("");
-  const [population, setPopulation] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30); // Timer countdown
-
-  const calculatePopulation = () =>
-    city.buildings.reduce((acc, b) => acc + b.population, 0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPopulation((prev) => prev + calculatePopulation());
-      setProgress(0);
-      setTimeLeft(30); // Reset timer
-    }, 30000);
-
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => (prev < 100 ? prev + 3.33 : 100));
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(progressInterval);
-    };
-  }, [city.buildings]);
-
-  const placeBuilding = (building: { type: string; emoji: string; cost: number; population: number }) => {
-    if (!selectedCell) {
-      setMessage("Please select a cell before placing a building.");
-      return;
-    }
-
-    const [row, col] = selectedCell;
-    if (city.grid[row][col] !== "⬜") {
-      setMessage("The selected cell is already occupied.");
-      return;
-    }
-
-    if (city.points < building.cost) {
-      setMessage(`Not enough points to build ${building.type}`);
-      return;
-    }
-
-    const newGrid = [...city.grid];
-    newGrid[row][col] = building.emoji;
-
-    setCity({
-      ...city,
-      grid: newGrid,
-      points: city.points - building.cost,
-      buildings: [...city.buildings, { type: building.type, position: [row, col], population: building.population }],
-    });
-
-    setSelectedCell(null);
-    setMessage("");
+  // Manual tap: add tapValue to money and count the tap
+  const handleTap = () => {
+    setMoney(prev => prev + tapValue);
+    setTotalTaps(prev => prev + 1);
   };
 
-  const upgradeBuilding = () => {
-    if (!selectedCell) {
-      setMessage("Please select a cell before upgrading.");
-      return;
+  // Upgrade tap: increases tapValue and scales up its cost
+  const upgradeTap = () => {
+    if (money >= tapUpgradeCost) {
+      setMoney(prev => prev - tapUpgradeCost);
+      setTapValue(prev => prev + 1);
+      setTapUpgradeCost(Math.floor(tapUpgradeCost * 1.7));
     }
+  };
 
-    const [row, col] = selectedCell;
-    const currentEmoji = city.grid[row][col];
-    const building = buildings.find((b) => b.emoji === currentEmoji);
-
-    if (!building || !building.upgrade) {
-      setMessage("This building cannot be upgraded.");
-      return;
-    }
-
-    if (city.grid[row][col] === building.upgrade.emoji) {
-      setMessage("This building is already upgraded.");
-      return;
-    }
-
-    if (city.points < building.upgrade.cost) {
-      setMessage(`Not enough points to upgrade to ${building.upgrade.type}`);
-      return;
-    }
-
-    const newGrid = [...city.grid];
-    newGrid[row][col] = building.upgrade.emoji;
-
-    const newBuildings = city.buildings.map((b) => {
-      if (b.position[0] === row && b.position[1] === col) {
-        return { ...b, type: building.upgrade.type, population: building.upgrade.population };
+  // Buy (upgrade) a building: cost increases with each level
+  const buyBuilding = (id: number) => {
+    const building = buildings.find(b => b.id === id);
+    if (building) {
+      const cost = Math.floor(building.baseCost * Math.pow(1.2, building.level));
+      if (money >= cost) {
+        setMoney(prev => prev - cost);
+        setBuildings(prev =>
+          prev.map(b =>
+            b.id === id ? { ...b, level: b.level + 1 } : b
+          )
+        );
       }
-      return b;
-    });
+    }
+  };
 
-    setCity({
-      ...city,
-      grid: newGrid,
-      points: city.points - building.upgrade.cost,
-      buildings: newBuildings,
-    });
+  // Big upgrade: when a building reaches a threshold level, allow a major efficiency boost.
+  const upgradeBuildingEfficiency = (id: number) => {
+    const building = buildings.find(b => b.id === id);
+    if (building) {
+      const currentThreshold = thresholds[building.nextBigUpgradeIndex];
+      if (currentThreshold !== undefined && building.level >= currentThreshold) {
+        const cost = Math.floor(building.baseCost * currentThreshold * 15);
+        if (money >= cost) {
+          setMoney(prev => prev - cost);
+          setBuildings(prev =>
+            prev.map(b =>
+              b.id === id
+                ? {
+                    ...b,
+                    efficiencyMultiplier: b.efficiencyMultiplier * 3,
+                    nextBigUpgradeIndex: b.nextBigUpgradeIndex + 1
+                  }
+                : b
+            )
+          );
+        }
+      }
+    }
+  };
 
-    // Flash effect on upgrade
-    const upgradedCell = document.querySelector(
-      `.city-block[data-row="${row}"][data-col="${col}"]`
-    );
-    if (upgradedCell) upgradedCell.classList.add("upgraded");
-    setTimeout(() => upgradedCell?.classList.remove("upgraded"), 600);
+  // Automatic income: add income from buildings every second.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMoney(prev => prev + totalIncome);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [totalIncome]);
 
-    setSelectedCell(null);
-    setMessage("");
+  // Achievement Checker: unlocks achievements based on milestones.
+  useEffect(() => {
+    const newAchievements: string[] = [];
+    if (totalTaps >= 1 && !achievements.includes("First Tap!")) {
+      newAchievements.push("First Tap!");
+    }
+    if (totalBuildingLevels >= 10 && !achievements.includes("Building Enthusiast")) {
+      newAchievements.push("Building Enthusiast");
+    }
+    if (money >= 10000 && !achievements.includes("Rich Community")) {
+      newAchievements.push("Rich Community");
+    }
+    if (tapValue >= 10 && !achievements.includes("Tap Master")) {
+      newAchievements.push("Tap Master");
+    }
+    if (totalIncome >= 1000 && !achievements.includes("Automation Guru")) {
+      newAchievements.push("Automation Guru");
+    }
+    if (newAchievements.length > 0) {
+      setAchievements(prev => [...prev, ...newAchievements]);
+    }
+  }, [totalTaps, totalBuildingLevels, money, tapValue, totalIncome, achievements]);
+
+  // Reset game: resets all game state (with confirmation).
+  const resetGame = () => {
+    if (window.confirm("Are you sure you want to reset your progress?")) {
+      setMoney(0);
+      setTapValue(1);
+      setTapUpgradeCost(50);
+      setTotalTaps(0);
+      setBuildings(initialBuildings.map(b => ({ ...b, level: 0, efficiencyMultiplier: 1, nextBigUpgradeIndex: 0 })));
+      setAchievements([]);
+    }
   };
 
   return (
-    <div className="build-city">
-      <Box className="city-animation">
-        <Box className="points-display">
-          <Typography variant="h6">Current Points: {city.points}</Typography>
-          <Typography variant="h6">Estimated Population: {population + calculatePopulation()}</Typography>
-        </Box>
+    <div className="build-city-game">
+      <header className="game-header">
+        <h1>Build Your Community</h1>
+      </header>
+      
+      <section className="stats-panel">
+        <div className="stat">
+          <span className="label">Money:</span>
+          <span className="value">${money.toFixed(0)}</span>
+        </div>
+        <div className="stat">
+          <span className="label">Tap Value:</span>
+          <span className="value">{tapValue}</span>
+        </div>
+        <div className="stat">
+          <span className="label">Income/sec:</span>
+          <span className="value">{totalIncome.toFixed(0)}</span>
+        </div>
+        <div className="stat">
+          <span className="label">Total Taps:</span>
+          <span className="value">{totalTaps}</span>
+        </div>
+      </section>
+      
+      <section className="tap-section">
+        <button className="tap-button" onClick={handleTap}>
+          Tap!
+        </button>
+        <button className="upgrade-tap-button" onClick={upgradeTap} disabled={money < tapUpgradeCost}>
+          Upgrade Tap (Cost: ${tapUpgradeCost})
+        </button>
+        <button className="reset-button" onClick={resetGame}>
+          Reset Game
+        </button>
+      </section>
 
-        {/* Timer Progress Bar with Countdown */}
-        <Box className="timer-line">
-          <Box className="timer-progress" style={{ width: `${progress}%` }}>
-            <Typography className="timer-text">{timeLeft}s</Typography>
-          </Box>
-        </Box>
-
-        {/* Controls */}
-        <Box className="controls">
-          {buildings.map((building) => (
-            <Tooltip key={building.type} title={`Cost: ${building.cost} | Population: +${building.population}`} arrow>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={city.points < building.cost}
-                onClick={() => placeBuilding(building)}
-              >
-                Build {building.type} ({building.cost} points)
-              </Button>
-            </Tooltip>
-          ))}
-        </Box>
-
-        {message && <Typography variant="body2" color="error">{message}</Typography>}
-
-        {/* Upgrade Button */}
-        {selectedCell && city.grid[selectedCell[0]][selectedCell[1]] !== "⬜" && (
-          <Button className="upgrade-button" onClick={upgradeBuilding}>
-            Upgrade (
-            {buildings.find((b) => b.emoji === city.grid[selectedCell[0]][selectedCell[1]])?.upgrade?.cost || 0} points)
-          </Button>
+      <section className="achievements-section">
+        <h2>Achievements</h2>
+        {achievements.length === 0 ? (
+          <p>No achievements yet. Keep going!</p>
+        ) : (
+          <ul>
+            {achievements.map((ach, index) => (
+              <li key={index}>{ach}</li>
+            ))}
+          </ul>
         )}
+      </section>
 
-        {/* City Grid */}
-        <Box className="city-container">
-          {city.grid.map((row, i) =>
-            row.map((cell, j) => (
-              <Box
-                key={`${i}-${j}`}
-                data-row={i}
-                data-col={j}
-                className={`city-block ${cell !== "⬜" ? "filled" : ""} ${
-                  selectedCell?.[0] === i && selectedCell?.[1] === j ? "selected" : ""
-                }`}
-                onClick={() => setSelectedCell([i, j])}
-              >
-                {cell}
-              </Box>
-            ))
-          )}
-        </Box>
-      </Box>
+      <section className="buildings-section">
+        <h2>Buildings</h2>
+        <div className="buildings-list">
+          {buildings.map(b => {
+            const cost = Math.floor(b.baseCost * Math.pow(1.2, b.level));
+            const currentThreshold = thresholds[b.nextBigUpgradeIndex];
+            let bigUpgradeCost = 0;
+            let showBigUpgrade = false;
+            if (currentThreshold !== undefined && b.level >= currentThreshold) {
+              bigUpgradeCost = Math.floor(b.baseCost * currentThreshold * 15);
+              showBigUpgrade = true;
+            }
+            return (
+              <div key={b.id} className="building-card">
+                <h3>{b.name}</h3>
+                <p>Level: {b.level}</p>
+                <p>Income: ${(b.level * b.baseIncome * b.efficiencyMultiplier).toFixed(0)}/sec</p>
+                <button onClick={() => buyBuilding(b.id)} disabled={money < cost}>
+                  Buy (Cost: ${cost})
+                </button>
+                {showBigUpgrade && (
+                  <button onClick={() => upgradeBuildingEfficiency(b.id)} disabled={money < bigUpgradeCost}>
+                    Big Upgrade (Cost: ${bigUpgradeCost})
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 };
