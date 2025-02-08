@@ -1,5 +1,16 @@
 import React from 'react';
-import { Avatar, Card, CardContent, Typography, Grid, LinearProgress, Box, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
+import {
+  Avatar,
+  Card,
+  CardContent,
+  Typography,
+  LinearProgress,
+  Box,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+} from '@mui/material';
 import { MonetizationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import './Profile.scss';
@@ -35,6 +46,13 @@ const Profile: React.FC = () => {
     { name: 'Eve', level: 1, online: true, picture: 'https://via.placeholder.com/50' },
     { name: 'Frank', level: 3, online: false, picture: 'https://via.placeholder.com/50' },
     { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
+    { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
+    { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
+    { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
+    { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
+    { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
+    { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
+    { name: 'Grace', level: 4, online: true, picture: 'https://via.placeholder.com/50' },
   ];
 
   const handleLevelClick = () => {
@@ -47,6 +65,7 @@ const Profile: React.FC = () => {
 
   return (
     <div className="profile">
+      {/* Profile Header */}
       <header className="profile-header">
         <Avatar alt={user.name} src={user.picture} className="profile-picture" />
         <Box className="profile-info">
@@ -66,58 +85,48 @@ const Profile: React.FC = () => {
         </Box>
       </header>
 
-      <Grid container spacing={3} className="profile-details">
-        <Grid item xs={12} sm={6} md={8}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <Card className="profile-card level-card" onClick={handleLevelClick}>
-                <CardContent>
-                  <Typography variant="h6">Level</Typography>
-                  <Typography variant="body1">Level {user.level}</Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={(user.points / user.xpToNextLevel) * 100}
-                    className="level-progress"
-                  />
-                  <Typography variant="body2">
-                    {user.points} / {user.xpToNextLevel} Points
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Card className="profile-card statistics-card" onClick={handleStatisticsClick}>
-                <CardContent>
-                  <Typography variant="h6">Statistics</Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={4}>
-                      <Typography variant="body1">Calls Made: {user.callsMade}</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Typography variant="body1">Likes Received: {user.likesReceived}</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Typography variant="body1">Daily Streak: {user.dailyStreak} days</Typography>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12}>
-              <Card className="profile-card">
-                <CardContent>
-                  <Typography variant="h6">Call History</Typography>
-                  {user.lastCalls.map((call, index) => (
-                    <Typography key={index} variant="body2">
-                      {call.date} - {call.duration} - {call.liked ? 'Liked' : 'Not Liked'}
-                    </Typography>
-                  ))}
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+      {/* Profile Details */}
+      <div className="profile-details">
+        {/* Main Cards */}
+        <div className="main-cards">
+          <Card className="profile-card level-card" onClick={handleLevelClick}>
+            <CardContent>
+              <Typography variant="h6">Level</Typography>
+              <Typography variant="body1">Level {user.level}</Typography>
+              <LinearProgress
+                variant="determinate"
+                value={(user.points / user.xpToNextLevel) * 100}
+                className="level-progress"
+              />
+              <Typography variant="body2">
+                {user.points} / {user.xpToNextLevel} Points
+              </Typography>
+            </CardContent>
+          </Card>
+
+          <Card className="profile-card statistics-card" onClick={handleStatisticsClick}>
+            <CardContent>
+              <Typography variant="h6">Statistics</Typography>
+              <Typography variant="body1">Calls Made: {user.callsMade}</Typography>
+              <Typography variant="body1">Likes Received: {user.likesReceived}</Typography>
+              <Typography variant="body1">Daily Streak: {user.dailyStreak} days</Typography>
+            </CardContent>
+          </Card>
+
+          <Card className="profile-card call-history-card">
+            <CardContent>
+              <Typography variant="h6">Call History</Typography>
+              {user.lastCalls.map((call, index) => (
+                <Typography key={index} variant="body2">
+                  {call.date} - {call.duration} - {call.liked ? 'Liked' : 'Not Liked'}
+                </Typography>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Friends Card */}
+        <div className="friends-container">
           <Card className="profile-card friends-card">
             <CardContent>
               <Typography variant="h6">Friends</Typography>
@@ -127,17 +136,14 @@ const Profile: React.FC = () => {
                     <ListItemAvatar>
                       <Avatar alt={friend.name} src={friend.picture} />
                     </ListItemAvatar>
-                    <ListItemText
-                      primary={friend.name}
-                      secondary={`Level ${friend.level}`}
-                    />
+                    <ListItemText primary={friend.name} secondary={`Level ${friend.level}`} />
                   </ListItem>
                 ))}
               </List>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
     </div>
   );
 };

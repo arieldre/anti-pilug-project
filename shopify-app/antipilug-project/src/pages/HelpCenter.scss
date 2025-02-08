@@ -20,11 +20,16 @@
     }
   
     .help-card {
+      height: 80%; // Stretch cards to match the tallest in the row
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       padding: 20px;
       background-color: white;
-      text-align: center;
+    
   
       .card-content {
         display: flex;
@@ -50,4 +55,8 @@
         margin-top: 10px;
       }
     }
+  }
+
+  .grid-container {
+    align-items: stretch; // Ensure cards in each row have the same height
   }

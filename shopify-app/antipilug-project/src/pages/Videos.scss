@@ -74,18 +74,20 @@
       box-shadow: none;
       border: 1px solid #eee;
       transition: all 0.3s ease;
-      background-color: #fff;
       cursor: pointer;
-      
+      height: 100%; // Ensure consistent height
+      display: flex;
+      flex-direction: column;
+
       &:hover {
         transform: translateY(-4px);
       }
-      
+
       .video-thumbnail {
         position: relative;
         height: 180px;
         background-size: cover;
-        
+
         .video-duration {
           position: absolute;
           bottom: 8px;
@@ -95,52 +97,33 @@
           padding: 4px 8px;
           border-radius: 6px;
           font-size: 12px;
-          font-weight: 500;
         }
       }
-      
+
+      .card-content {
+        flex-grow: 1; // Ensures content fills space
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+      }
+
       .video-title {
-        margin: 8px 0;
         font-weight: 500;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
-      
-      .video-tags {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin: 12px 0;
-        
-        .tag-chip {
-          border-radius: 8px;
-          background-color: #f0f7ff;
-          color: #1976d2;
-          font-weight: 500;
-          
-          &:hover {
-            background-color: #e3f2fd;
-          }
-        }
-      }
-      
-      .video-actions {
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-        margin-top: 12px;
-        
-        .MuiIconButton-root {
-          color: #666;
-          padding: 8px;
-          
-          &:hover {
-            color: #1976d2;
-            background-color: #f0f7ff;
-          }
-        }
+
+      .video-description {
+        margin: 8px 0;
+        color: #666;
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
     }
   }
