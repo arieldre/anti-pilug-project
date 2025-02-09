@@ -1,192 +1,1280 @@
-/* BuildCity.scss */
-.build-city-game {
-  background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-  min-height: 100vh;
-  padding: 20px;
-  color: #333;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+// Move all variables to the top
+$colors: (
+  primary: #4caf50,
+  secondary: #2196f3,
+  warning: #f44336,
+  building-bg: #fff,
+  sky-start: #87CEEB,
+  sky-end: #E0F6FF,
+  ground-start: #90EE90,
+  ground-end: #228B22
+);
+
+$buildings: (
+  farm: #8fbc8f,
+  bakery: #d2691e,
+  house: #deb887,
+  school: #f1c40f,
+  library: #7d3c98,
+  hospital: #ecf0f1,
+  park: #2ecc71,
+  museum: #e67e22,
+  skyscraper: #a5d6a7,
+  stadium: #e0e0e0
+);
+
+/* Variables for colors, sizes, etc. */
+$bg-gradient-start: #a6e3ff;
+$bg-gradient-end: #d8f3dc;
+
+$empty-cell-bg: rgba(255, 255, 255, 0.2);
+$empty-cell-border: rgba(255, 255, 255, 0.3);
+
+$building-default-color: #f44336;
+$building-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$building-border: #fff;
+
+$roof-color: #ffeb3b;
+$window-color: #ffffff;
+
+/* Mixin for smooth transitions */
+@mixin building-transition {
+  transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease;
+}
+
+/* Overall container for the city scene */
+.build-city {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  padding-top: 70px; // Space for navbar
+  cursor: pointer; // Shows clickable cursor everywhere
+
+  /* Sky background with clouds */
+  .sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: #a6e3ff;
+    overflow: hidden;
+    z-index: 0;
+    
+    .clouds {
+      position: relative;
+      
+      .cloud {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        width: 100px;
+        height: 60px;
+        position: absolute;
+        animation: pulse 5s infinite;
+      }
+      .c1 { left: 10%; top: 10%; width: 120px; height: 70px; }
+      .c2 { left: 40%; top: 20%; width: 100px; height: 60px; }
+      .c3 { left: 70%; top: 15%; width: 130px; height: 80px; }
+    }
+  }
   
+  /* City silhouette in the background */
+  .city-silhouette {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: rgba(0,0,0,0.4);
+    clip-path: polygon(0 100%, 10% 60%, 20% 80%, 30% 50%, 40% 70%, 50% 40%, 60% 65%, 70% 45%, 80% 70%, 90% 55%, 100% 100%);
+    z-index: 1;
+  }
+
+  /* Game header for displaying info */
   .game-header {
-    text-align: center;
-    margin-bottom: 20px;
-    
-    h1 {
-      font-size: 3rem;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-  }
-  
-  .stats-panel {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 999;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    background: rgba(255, 255, 255, 0.8);
+    justify-content: space-between;
+    align-items: center;
     padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    
-    .stat {
-      margin: 10px;
-      font-size: 1.2rem;
-      
-      .label {
-        font-weight: bold;
-        margin-right: 5px;
-      }
-      
-      .value {
-        color: #2c3e50;
-      }
-    }
   }
-  
-  .tap-section {
-    text-align: center;
-    margin-bottom: 30px;
+
+  .resources {
+    display: flex;
+    gap: 20px;
     
-    button {
-      margin: 10px;
-      padding: 15px 25px;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.1s, background 0.3s;
-    }
-    
-    .tap-button {
-      background: #27ae60;
-      color: #fff;
-    }
-    
-    .tap-button:active {
-      transform: scale(0.95);
-    }
-    
-    .upgrade-tap-button {
-      background: #2980b9;
-      color: #fff;
-    }
-    
-    .upgrade-tap-button:disabled {
-      background: #bdc3c7;
-      cursor: not-allowed;
-    }
-    
-    .reset-button {
-      background: #c0392b;
-      color: #fff;
-    }
-  }
-  
-  .achievements-section {
-    background: rgba(255,255,255,0.9);
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    
-    h2 {
-      margin-bottom: 10px;
-    }
-    
-    ul {
-      list-style-type: none;
-      padding: 0;
-      
-      li {
-        background: #f1c40f;
-        padding: 8px 12px;
-        border-radius: 5px;
-        margin: 5px 0;
-        font-weight: bold;
-        color: #2c3e50;
-      }
-    }
-    
-    p {
-      font-size: 1rem;
-      color: #555;
-    }
-  }
-  
-  .buildings-section {
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #fff;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    }
-    
-    .buildings-list {
+    .resource {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      
-      .building-card {
-        background: rgba(255,255,255,0.95);
-        border: 2px solid #ecf0f1;
-        border-radius: 10px;
-        padding: 15px;
-        margin: 10px;
-        width: 220px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        text-align: center;
-        
-        h3 {
-          margin-top: 0;
-          margin-bottom: 10px;
-          color: #34495e;
-        }
-        
-        p {
-          margin: 8px 0;
-          font-size: 1rem;
-          color: #2c3e50;
-        }
-        
-        button {
-          margin: 5px 0;
-          padding: 8px 12px;
-          font-size: 0.9rem;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          transition: background 0.3s;
-        }
-        
-        button:first-of-type {
-          background: #8e44ad;
-          color: #fff;
-        }
-        
-        button:first-of-type:disabled {
-          background: #bdc3c7;
-          cursor: not-allowed;
-        }
-        
-        button:last-of-type {
+      align-items: center;
+      gap: 8px;
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      color: #fff;
+      font-weight: 600;
+
+      .icon {
+        font-size: 1.2rem;
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+
+  // Background grid for empty cells (shown on initial load)
+  .background-grid {
+    position: absolute;
+    top: 70px; // below navbar
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 70px);
+    z-index: 2;
+    opacity: 0.8;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background-image: 
+      linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 26%, transparent 27%),
+      linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 26%, transparent 27%);
+    background-size: 80px 80px;
+  }
+
+  // Foreground container where buildings will be rendered
+  .city-container {
+    position: relative;
+    width: 100%;
+    height: 600px; // Enough height for multiple rows
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .building {
+    position: absolute;
+    transition: all 0.3s ease;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 2; // Added to ensure visibility
+
+    // First row
+    &.farm {
+      bottom: 50px;
+      left: 100px;
+      width: 120px;
+      height: 90px;
+      background: #8fbc8f;
+    }
+
+    &.bakery {
+      bottom: 50px;
+      left: 250px;
+      width: 100px;
+      height: 120px;
+      background: #d2691e;
+    }
+
+    &.house {
+      bottom: 50px;
+      left: 400px;
+      width: 90px;
+      height: 110px;
+      background: #deb887;
+    }
+
+    &.school {
+      bottom: 50px;
+      left: 550px;
+      width: 100px;
+      height: 100px;
+      background: #f1c40f;
+    }
+
+    &.library {
+      bottom: 50px;
+      left: 700px;
+      width: 110px;
+      height: 130px;
+      background: #7d3c98;
+    }
+
+    // Second row (directly above first row buildings)
+    &.hospital {
+      bottom: 200px; // Higher position
+      left: 100px; // Same as farm
+      width: 120px;
+      height: 140px;
+      background: #ecf0f1;
+      z-index: 3; // Higher z-index for second row
+    }
+
+    &.park {
+      bottom: 200px;
+      left: 250px; // Same as bakery
+      width: 150px;
+      height: 100px;
+      background: #2ecc71;
+      z-index: 3;
+    }
+
+    &.museum {
+      position: absolute;
+      bottom: 350px; // Changed from 350px to match other second row buildings
+      left: 670px; // Aligned with other buildings
+      width: 140px;
+      height: 120px;
+      background: #e67e22;
+      border-radius: 8px;
+      z-index: 3;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      overflow: visible; // Important to show sign and stairs
+
+      // Museum sign above the building
+      .sign {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #f1c40f;
+        color: #333;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      // Decorative columns inside the museum
+      .columns {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        height: 70%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+
+        // Individual columns
+        .column {
+          width: 12px;
           background: #d35400;
-          color: #fff;
+          border-radius: 2px;
+          height: 50%;
+          position: relative;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -3px;
+            width: 18px;
+            height: 6px;
+            background: #c0392b;
+            border-radius: 2px;
+          }
+        }
+      }
+
+      // Stairs at the bottom of the museum
+      .stairs {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 20px;
+        background: linear-gradient(
+          180deg,
+          #d35400 0%,
+          #e67e22 50%,
+          #f39c12 100%
+        );
+        border-radius: 4px;
+        z-index: -1;
+      }
+    }
+  }
+
+  // Panel for displaying selected building information
+  .selected-building {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: none;
+
+    &.visible {
+      display: block;
+    }
+
+    .building-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .building-level {
+      font-size: 1.1rem;
+      margin-top: 5px;
+      color: #ffd700;
+    }
+    .building-production {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #4caf50;
+    }
+  }
+
+  // Stats panel styling
+  .stats-panel {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    gap: 20px;
+    z-index: 1000;
+
+    .stat {
+      color: white;
+      text-align: center;
+
+      .label {
+        display: block;
+        font-size: 0.8em;
+        opacity: 0.8;
+      }
+
+      .value {
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+    }
+  }
+
+  // Tap pop-up animation
+  .tap-pop {
+    position: fixed;
+    z-index: 1000;
+    font-weight: bold;
+    font-size: 24px;
+    color: #4caf50;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    animation: tapFade 0.8s ease-out forwards;
+
+    &::before {
+      content: '💰';
+      margin-right: 5px;
+    }
+  }
+
+  // Controls section
+  .tap-section {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+
+      &.upgrade-tap-button {
+        background: #4caf50;
+        color: white;
+
+        &:disabled {
+          background: #cccccc;
+          cursor: not-allowed;
+        }
+      }
+
+      &.reset-button {
+        background: #f44336;
+        color: white;
+      }
+    }
+  }
+
+  // Keyframe animations
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1.2); }
+  }
+}
+
+.tap-pop {
+  position: fixed;
+  z-index: 1000;
+  font-weight: bold;
+  color: #4caf50;
+  animation: tapFade 0.8s ease-out forwards;
+}
+
+@keyframes tapFade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -80%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+@keyframes smoke {
+  0% { 
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translateY(-30px) scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes popAndFloat {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -60%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -100%) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes growRow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes growCrop {
+  0% { 
+    height: 10px;
+    transform: rotate(-2deg);
+  }
+  100% { 
+    height: 40px;
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes showFlower {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+// Weather effects
+.weather-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  .rain {
+    position: absolute;
+    width: 2px;
+    height: 10px;
+    background: rgba(255,255,255,0.5);
+    animation: rain 1s linear infinite;
+  }
+
+  .sunshine {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,0,0.2);
+    border-radius: 50%;
+    animation: sunshine 4s ease infinite;
+  }
+}
+
+@keyframes rain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes sunshine {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
+}
+
+.farm {
+  position: absolute;
+  bottom: 20vh;
+  left: 10vw;
+  width: 300px;
+  height: 200px;
+  z-index: 2;
+
+  .field {
+    width: 100%;
+    height: 100%;
+    background: #8B4513;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .soil-rows {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    .row {
+      height: 4px;
+      background: #654321;
+      transform-origin: left;
+      transform: scaleX(0);
+      animation: growRow 1s ease-out forwards;
+    }
+  }
+
+  .crops-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: 10px;
+
+    .crop {
+      width: 10px;
+      background: linear-gradient(180deg, #228B22 0%, #32CD32 100%);
+      transform-origin: bottom;
+      animation: growCrop 2s infinite alternate ease-in-out;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        background: #FFD700;
+        border-radius: 50%;
+        transform: translateX(-50%) scale(0);
+        animation: bloomFlower 3s infinite alternate ease-in-out;
+      }
+    }
+  }
+}
+
+@keyframes growSoil {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes bloomFlower {
+  0% { 
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+  50% { 
+    transform: translateX(-50%) scale(1.2);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(-50%) scale(1);
+    opacity: 0.8;
+  }
+}
+
+// Fix city layout and building positions
+.city-layout {
+  position: absolute;
+  bottom: 0;
+  left: 0; // Reset to original position
+  width: 100%;
+  height: 70vh;
+  background: linear-gradient(180deg, #90EE90 0%, #228B22 100%);
+  z-index: 1;
+
+  .buildings-container {
+    position: relative;
+    height: 100%;
+    
+    // Base building styles
+    .building-base {
+      position: absolute;
+      bottom: 150px;
+      transform-origin: bottom;
+    }
+    .building-base2 {
+      position: absolute;
+      bottom: 350px;
+      transform-origin: bottom;
+    }
+
+    // Reset building positions to original locations
+    .farm {
+      @extend .building-base;
+      left: 300px;
+      width: 120px;
+      height: 90px;
+    }
+
+    .bakery {
+      @extend .building-base;
+      left: 500px;
+      width: 100px;
+      height: 120px;
+    }
+
+    .house {
+      @extend .building-base;
+      left: 700px;
+      width: 90px;
+      height: 110px;
+    }
+
+    // Add additional building styles
+    .school {
+      @extend .building-base;
+      left: 900px;
+      width: 100px;
+      height: 100px;
+      background: #F1C40F;
+      border-radius: 4px;
+
+      .roof {
+        position: absolute;
+        top: -15px;
+        width: 100%;
+        height: 20px;
+        background: #E67E22;
+        clip-path: polygon(0 100%, 50% 0, 100% 100%);
+      }
+
+      .window {
+        position: absolute;
+        width: 16px;
+        height: 20px;
+        background: #ecf0f1;
+        border: 2px solid #c0392b;
+        animation: windowLight 4s infinite alternate;
+
+        &.w1 { top: 20px; left: 10px; }
+        &.w2 { top: 20px; right: 10px; }
+        &.w3 { top: 50px; left: 10px; }
+        &.w4 { top: 50px; right: 10px; }
+      }
+    }
+
+    // Zoom out effect when many buildings
+    &.many-buildings {
+      transform: scale(0.8) translateY(10%);
+      
+      .building-base {
+        transform: scale(0.8);
+      }
+    }
+
+    .bakery {
+      position: absolute;
+      bottom: 150px;
+      left: 500px;
+      width: 100px;
+      height: 120px;
+      background: #D2691E;
+      border-radius: 8px;
+      z-index: 2;
+
+      .chimney {
+        position: absolute;
+        top: -20px;
+        right: 20px;
+        width: 20px;
+        height: 30px;
+        background: #8B4513;
+      }
+
+      .smoke {
+        position: absolute;
+        background: rgba(255,255,255,0.8);
+        border-radius: 50%;
+        animation: float 2s infinite;
+      }
+    }
+
+    .house {
+      position: absolute;
+      bottom: 150px;
+      left: 700px;
+      width: 90px;
+      height: 110px;
+      background: #DEB887;
+      border-radius: 8px;
+      z-index: 2;
+
+      .roof {
+        position: absolute;
+        top: -20px;
+        width: 100%;
+        height: 40px;
+        background: #8B4513;
+        clip-path: polygon(0 100%, 50% 0, 100% 100%);
+      }
+
+      .window {
+        position: absolute;
+        width: 20px;
+        height: 25px;
+        background: #F0F8FF;
+        border: 2px solid #8B4513;
+        animation: windowLight 4s infinite alternate;
+
+        &.left { left: 15px; top: 30px; }
+        &.right { right: 15px; top: 30px; }
+      }
+
+      .door {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 40px;
+        background: #8B4513;
+        border-radius: 3px 3px 0 0;
+      }
+    }
+
+    // Library
+    .library {
+      @extend .building-base;
+      left: 1100px;
+      width: 110px;
+      height: 130px;
+      background: #7D3C98;
+      border-radius: 8px;
+      z-index: 2;
+
+      &::before {
+        content: 'LIBRARY';
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 3px 8px;
+        background: #4A235A;
+        color: #fff;
+        font-size: 10px;
+        border-radius: 4px;
+      }
+
+      .window {
+        position: absolute;
+        width: 14px;
+        height: 18px;
+        background: #fff;
+        border: 2px solid #5B2C6F;
+        animation: windowLight 4s infinite alternate;
+
+        &.w1 { top: 20px; left: 10px; }
+        &.w2 { top: 20px; right: 10px; }
+        &.w3 { top: 50px; left: 10px; }
+        &.w4 { top: 50px; right: 10px; }
+        &.w5 { top: 80px; left: 50%; transform: translateX(-50%); }
+      }
+
+      .door {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 30px;
+        background: #D7BDE2;
+        border: 2px solid #5B2C6F;
+        border-radius: 2px 2px 0 0;
+      }
+    }
+
+    .hospital {
+      @extend .building-base2;
+      left: 300px;
+      width: 120px;
+      height: 140px;
+      background: #ECF0F1;
+      border-radius: 8px;
+      z-index: 2;
+
+      .red-cross {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 30px;
+        background: #E74C3C;
+        
+        &::before,
+        &::after {
+          content: '';
+          position: absolute;
+          background: #E74C3C;
         }
         
-        button:last-of-type:disabled {
-          background: #bdc3c7;
-          cursor: not-allowed;
+        &::before {
+          top: 50%;
+          left: -5px;
+          right: -5px;
+          height: 8px;
+          transform: translateY(-50%);
+        }
+        
+        &::after {
+          left: 50%;
+          top: -5px;
+          bottom: -5px;
+          width: 8px;
+          transform: translateX(-50%);
+        }
+      }
+
+      .window {
+        position: absolute;
+        width: 20px;
+        height: 25px;
+        background: #F0F8FF;
+        border: 2px solid #BDC3C7;
+        animation: windowLight 4s infinite alternate;
+
+        &.w1 { left: 20px; top: 60px; }
+        &.w2 { right: 20px; top: 60px; }
+        &.w3 { left: 50%; transform: translateX(-50%); top: 90px; }
+      }
+    }
+
+    .park {
+      @extend .building-base2;
+      left: 500px;
+      width: 100px;
+      height: 120px;
+      background: #2ECC71;
+      border-radius: 8px;
+      z-index: 2;
+
+      .tree {
+        position: absolute;
+        width: 30px;
+        height: 60px;
+        
+        .tree-crown {
+          position: absolute;
+          top: 0;
+          width: 30px;
+          height: 30px;
+          background: #27AE60;
+          border-radius: 50%;
+          animation: sway 3s infinite alternate ease-in-out;
+        }
+
+        .tree-trunk {
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 6px;
+          height: 30px;
+          background: #8B4513;
+        }
+
+        &.t1 {
+          left: 20px;
         }
       }
     }
   }
+}
+
+// Add window light animation
+@keyframes windowLight {
+  0% { background: #F0F8FF; }
+  100% { background: #FFD700; }
+}
+
+// Add building container check
+.buildings-container {
+  position: relative;
+  height: 100%;
+  padding: 20px;
+
+  // Base styles for all buildings
+  .building-base {
+    position: absolute;
+    transform-origin: bottom;
+    transition: all 0.3s ease;
+  }
+
+  // First row (bottom)
+  .farm {
+    @extend .building-base;
+    bottom: 50px;
+    left: 100px;
+    width: 120px;
+    height: 90px;
+  }
+
+  .bakery {
+    @extend .building-base;
+    bottom: 50px;
+    left: 250px;
+    width: 100px;
+    height: 120px;
+  }
+
+  .house {
+    @extend .building-base;
+    bottom: 50px;
+    left: 400px;
+    width: 90px;
+    height: 110px;
+  }
+
+  .school {
+    @extend .building-base;
+    bottom: 50px;
+    left: 550px;
+    width: 100px;
+    height: 100px;
+  }
+
+  .library {
+    @extend .building-base;
+    bottom: 50px;
+    left: 700px;
+    width: 110px;
+    height: 130px;
+  }
+
+  .museum {
+    position: absolute;
+    bottom: 350px; // Changed from 350px to match other second row buildings
+    left: 700px; // Aligned with other buildings
+    width: 140px;
+    height: 120px;
+    background: #e67e22;
+    border-radius: 8px;
+    z-index: 3;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    overflow: visible; // Important to show sign and stairs
+
+    // Museum sign above the building
+    .sign {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f1c40f;
+      color: #333;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    // Decorative columns inside the museum
+    .columns {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      width: calc(100% - 20px);
+      height: 70%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+
+      // Individual columns
+      .column {
+        width: 12px;
+        background: #d35400;
+        border-radius: 2px;
+        height: 50%;
+        position: relative;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: -6px;
+          left: -3px;
+          width: 18px;
+          height: 6px;
+          background: #c0392b;
+          border-radius: 2px;
+        }
+      }
+    }
+
+    // Stairs at the bottom of the museum
+    .stairs {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 20px;
+      background: linear-gradient(
+        180deg,
+        #d35400 0%,
+        #e67e22 50%,
+        #f39c12 100%
+      );
+      border-radius: 4px;
+      z-index: -1;
+    }
+  }
+
+  .skyscraper {
+    @extend .building-base2;
+    bottom: 200px;
+    left: 900px;
+    width: 80px;
+    height: 200px;
+    background: linear-gradient(180deg, #A5D6A7 0%, #81C784 100%);
+    border-radius: 4px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 10px,
+        rgba(0,0,0,0.1) 10px,
+        rgba(0,0,0,0.1) 20px
+      );
+    }
+  }
+
+  .stadium {
+    @extend .building-base2;
+    bottom: 200px;
+    left: 1050px;
+    width: 180px;
+    height: 100px;
+    background: #E0E0E0;
+    border-radius: 50% / 25%;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: 10%;
+      width: 80%;
+      height: 60%;
+      background: #9E9E9E;
+      border-radius: 50% / 25%;
+    }
+  }
+}
+
+// Remove duplicate building definitions and consolidate them under .buildings-container
+.buildings-container {
+  position: relative;
+  height: 100%;
+  padding: 20px;
   
-  @media (max-width: 768px) {
-    .stats-panel {
-      flex-direction: column;
-      align-items: center;
+  // Base building styles - remove duplicates
+  .building {
+    position: absolute;
+    transition: all 0.3s ease;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 2;
+
+    // First row positioning
+    &.farm, &.bakery, &.house, &.school, &.library {
+      bottom: 50px;
     }
-    
-    .buildings-list {
-      flex-direction: column;
-      align-items: center;
+
+    // Second row positioning
+    &.hospital, &.park, &.museum, &.skyscraper, &.stadium {
+      bottom: 350px;
+      z-index: 3;
     }
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+// Fix buildings section position
+.buildings-section {
+  position: fixed;
+  left: 20px;
+  bottom: 20px; // Move back to bottom
+  transform: none; // Remove transform
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(5px);
+  padding: 15px;
+  border-radius: 10px;
+  max-height: 40vh;
+  overflow-y: auto;
+  z-index: 100;
+  width: 250px;
+
+  .buildings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .building-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      opacity: 0.6;
+      pointer-events: none;
+
+      &.unlocked {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      &.can-buy {
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+
+      h3 {
+        margin: 0 0 10px 0;
+        color: #333;
+      }
+
+      p {
+        margin: 5px 0;
+        color: #666;
+      }
+
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 4px;
+        background: #4CAF50;
+        color: white;
+        cursor: pointer;
+
+        &:disabled {
+          background: #cccccc;
+          cursor: not-allowed;
+        }
+
+        &.big-upgrade {
+          background: #2196F3;
+        }
+      }
+    }
+  }
+}
+
+// Remove any transform scaling
+.buildings-container.many-buildings {
+  transform: none;
+  
+  .building-base {
+    transform: none;
   }
 }
