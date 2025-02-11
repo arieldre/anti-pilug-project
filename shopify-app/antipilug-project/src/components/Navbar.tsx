@@ -75,6 +75,11 @@ const Navbar: React.FC = () => {
           <Button color="inherit" component={Link} to="/profile">Profile</Button>
           <Button color="inherit" component={Link} to="/help-center">Help Center</Button>
           <Button color="inherit" component={Link} to="/about">About</Button>
+          <Button color="inherit" component={Link} to="/political-questionnaire">
+            <span className="nav-icon">📝</span>
+            <span className="nav-text">Questionnaire</span>
+          </Button>
+          
         </Typography>
         <Search className={isSearchFocused ? 'focused' : ''}>
           <SearchIconWrapper>
@@ -97,3 +102,16 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+
+// Additional styles
+const styles = {
+  navbar: {
+    // ...existing styles...
+    navItem: {
+      // ...existing styles...
+      '&:hover': {
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      },
+    },
+  },
+};

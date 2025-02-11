@@ -12,6 +12,8 @@ import Research from '../pages/Research';
 import BuildCity from '../pages/BuildCity';
 import FlappyBirdGame from '../pages/FlappyBirdGame';
 import VideoPage from '../pages/VideoPage';
+import PoliticalQuestionnaire from '../pages/Questionnaire/PoliticalQuestionnaire';
+import HobbiesQuestionnaire from '../pages/Questionnaire/HobbiesQuestionnaire';
 
 const Router: React.FC = () => {
   return (
@@ -28,6 +30,8 @@ const Router: React.FC = () => {
       <Route path="/video/:id" element={<VideoPage />} />
       <Route path="/build-city" element={<BuildCity />} />
       <Route path="/flappy-bird-game" element={<FlappyBirdGame />} />
+      <Route path="/political-questionnaire" element={<PoliticalQuestionnaire />} />
+      <Route path="/hobbies-questionnaire" element={<HobbiesQuestionnaire />} />
     </Routes>
   );
 };

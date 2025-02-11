@@ -1,0 +1,87 @@
+.questionnaire {
+  padding: 20px;
+}
+
+.scale-question {
+  margin-bottom: 20px;
+}
+
+.special-question {
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  height: 10px;
+  background-color: #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.progress {
+  height: 100%;
+  background-color: #4caf50;
+}
+
+.questionnaire-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.questionnaire-section {
+  margin-bottom: 3rem;
+}
+
+.question-container {
+  margin-bottom: 1.5rem;
+}
+
+/* Transition styles */
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+.fade-exit {
+  opacity: 1;
+}
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}
+
+/* Question counter */
+.question-counter {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.scale-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem 0;          // Added vertical padding
+}
+
+.scale-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  min-width: 2.5rem;
+  text-align: center;
+  background-color: #4caf50;  // Changed to match progress bar color
+  color: white;               // Added white text
+  padding: 0.5rem 1rem;      // Increased padding
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  // Added subtle shadow
+  margin-left: 1rem;         // Added margin from the slider
+}
+
+input[type="range"] {
+  width: 100%;
+  max-width: 400px;
+  cursor: pointer;           // Added cursor pointer
+}

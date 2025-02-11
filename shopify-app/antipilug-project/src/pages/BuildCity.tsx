@@ -110,8 +110,8 @@ const BuildCity: React.FC = () => {
   const upgradeTap = () => {
     if (money >= tapUpgradeCost) {
       setMoney(prev => prev - tapUpgradeCost);
-      setTapValue(prev => prev + 1);
-      setTapUpgradeCost(Math.floor(tapUpgradeCost * 1.7));
+      setTapValue(prev => prev * 2);
+      setTapUpgradeCost(Math.floor(tapUpgradeCost * 2.2));
     }
   };
 
@@ -145,7 +145,7 @@ const BuildCity: React.FC = () => {
               b.id === id
                 ? {
                     ...b,
-                    efficiencyMultiplier: b.efficiencyMultiplier * 3,
+                    efficiencyMultiplier: b.efficiencyMultiplier * 17,
                     nextBigUpgradeIndex: b.nextBigUpgradeIndex + 1
                   }
                 : b
