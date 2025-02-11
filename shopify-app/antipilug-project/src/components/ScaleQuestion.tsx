@@ -8,6 +8,9 @@ interface ScaleQuestionProps {
 }
 
 const ScaleQuestion: React.FC<ScaleQuestionProps> = ({ question, value, onChange }) => {
+  // Calculate the percentage for the background gradient
+  const percentage = ((value - 1) / 9) * 100;
+  
   return (
     <div className="scale-question">
       <p>{question.text}</p>
@@ -18,6 +21,9 @@ const ScaleQuestion: React.FC<ScaleQuestionProps> = ({ question, value, onChange
           max="10" 
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value))}
+          style={{
+            background: `linear-gradient(to right, #4caf50 ${percentage}%, #e0e0e0 ${percentage}%)`
+          }}
         />
         <span className="scale-value">{value}</span>
       </div>

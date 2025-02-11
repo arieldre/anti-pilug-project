@@ -7,7 +7,7 @@ import './Questionnaire.scss';
 
 const PoliticalQuestionnaire: React.FC = () => {
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState<number[]>(new Array(politicalQuestions.length).fill(5));
+  const [answers, setAnswers] = useState<number[]>(new Array(politicalQuestions.length).fill(0));
 
   const handleAnswerChange = (index: number, value: number) => {
     const newAnswers = [...answers];
@@ -28,14 +28,18 @@ const PoliticalQuestionnaire: React.FC = () => {
           {politicalQuestions.map((question, index) => (
             <div key={question.id} className="question-item">
               <div className="question-number">Question {index + 1}</div>
-              {question.type === 'scale' ? (
-                <ScaleQuestion 
+              {question.type === 'special' ? (
+                <SpecialQuestion 
                   question={question} 
                   value={answers[index]}
                   onChange={(value) => handleAnswerChange(index, value)}
                 />
               ) : (
-                <SpecialQuestion question={question} />
+                <ScaleQuestion 
+                  question={question} 
+                  value={answers[index]}
+                  onChange={(value) => handleAnswerChange(index, value)}
+                />
               )}
             </div>
           ))}
