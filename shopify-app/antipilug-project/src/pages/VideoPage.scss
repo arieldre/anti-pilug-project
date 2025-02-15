@@ -2,24 +2,25 @@
   padding-top: 64px;
   min-height: 100vh;
   background-color: #fff;
+  
 }
 
 .video-page {
   padding: 24px;
   background-color: #fff;
-  
+
   .video-container {
+    position: relative;
     width: 100%;
-    aspect-ratio: 16/9;
+    padding-top: 56.25%; // 16:9 aspect ratio
     background: #000;
-    margin-bottom: 16px;
-    border-radius: 12px;
-    overflow: hidden;
-    
-    .video-placeholder {
+    margin-bottom: 20px;
+    .video-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
     }
   }
   
@@ -27,6 +28,10 @@
     margin-bottom: 12px;
   }
   
+  .related-title {
+    color: #000;
+  }
+
   .video-info {
     margin-bottom: 24px;
     
@@ -96,8 +101,7 @@
   .related-videos {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    
+    height: 40%;
     .related-video-card {
       display: flex;
       cursor: pointer;
@@ -106,25 +110,69 @@
       border: 1px solid #eee;
       box-shadow: none !important;
       border-radius: 8px;
-      
+      margin-bottom: 0.5rem; // Reduced from 1rem
+      cursor: pointer;
+      transition: transform 0.2s;
+      height: auto; // Let content determine height
+
       &:hover {
-        transform: translateY(-2px);
+        transform: scale(1.02);
       }
-      
+
+      .thumbnail-container {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%; // 16:9 aspect ratio
+        overflow: hidden;
+
+        img {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover; // This ensures the image covers the full container
+        }
+
+        .duration {
+          position: absolute;
+          bottom: 8px;
+          right: 8px;
+          background: rgba(0, 0, 0, 0.8);
+          color: white;
+          padding: 2px 4px;
+          border-radius: 2px;
+          font-size: 12px;
+        }
+      }
+
       .MuiCardContent-root {
         background: #fff;
         box-shadow: none !important;
-      }
-      
-      img {
-        width: 168px;
-        height: 94px;
-        object-fit: cover;
-      }
-      
-      .MuiCardContent-root {
-        padding: 8px;
-        flex: 1;
+        padding: 8px; // Reduced padding
+        height: auto;
+        
+        .MuiTypography-subtitle2 {
+          font-size: 0.875rem; // Slightly smaller font
+          line-height: 1.2;
+          margin-bottom: 2px; // Reduced margin
+          // Limit to 2 lines
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .MuiTypography-caption {
+          font-size: 0.75rem;
+          line-height: 1.1;
+          // Keep view count and timestamp on same line
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: rgba(0, 0, 0, 0.6);
+        }
       }
     }
   }
@@ -135,9 +183,36 @@
   }
 }
 
+.thumbnail-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .duration {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-size: 12px;
+  }
+}
+
 .MuiPaper-elevation1,
 .MuiPaper-elevation2,
 .MuiPaper-elevation3,
 .MuiPaper-elevation4 {
   box-shadow: none !important;
-} 
+}

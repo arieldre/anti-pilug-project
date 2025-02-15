@@ -140,29 +140,16 @@ const tags = [
   ["Transportation", "Urban", "Policy"],
 ];
 
-export const generateMockVideos = (page: number, perPage: number) => {
-  const startIndex = (page - 1) * perPage;
-  const videos = [];
-
-  for (let i = 0; i < perPage; i++) {
-    const id = startIndex + i + 1;
-    const titleIndex = (id - 1) % titles.length;
-    const topic = Object.keys(topicImages)[id % Object.keys(topicImages).length];
-    const topicImageArray = topicImages[topic as keyof typeof topicImages];
-    const imageIndex = id % topicImageArray.length;
-
-    videos.push({
-      id,
-      title: titles[titleIndex],
-      thumbnail: `${topicImageArray[imageIndex]}?w=320&h=180&fit=crop`,
-      channel: channels[id % channels.length],
-      views: `${Math.floor(Math.random() * 900 + 100)}K`,
-      timestamp: `${Math.floor(Math.random() * 14 + 1)} days ago`,
-      duration: `${Math.floor(Math.random() * 20 + 5)}:${Math.floor(Math.random() * 59).toString().padStart(2, '0')}`,
-      tags: tags[id % tags.length],
-      likes: Math.floor(Math.random() * 5000 + 500)
-    });
-  }
-
-  return videos;
-}; 
+export const generateMockVideos = (start: number, count: number): Video[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: start + i,
+    title: `Sample Video ${start + i}`,
+    description: `This is a description for video ${start + i}`,
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Replace with actual YouTube URLs
+    thumbnail: `https://picsum.photos/seed/${start + i}/320/180`,
+    views: Math.floor(Math.random() * 1000000),
+    timestamp: `${Math.floor(Math.random() * 12) + 1} months ago`,
+    tags: ['tag1', 'tag2', 'tag3'],
+    duration: `${Math.floor(Math.random() * 10) + 1}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`
+  }));
+};
