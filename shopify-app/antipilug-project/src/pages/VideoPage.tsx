@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Video } from '../types/video';
 import {
   Grid,
   Typography,
@@ -33,11 +34,24 @@ interface Comment {
 const VideoPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [video, setVideo] = useState<any>(null);
-  const [relatedVideos, setRelatedVideos] = useState<any[]>([]);
+  const [video, setVideo] = useState<Video | null>(null);
+  const [relatedVideos, setRelatedVideos] = useState<Video[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentSort, setCommentSort] = useState('recent');
   const [newComment, setNewComment] = useState('');
+
+  // Helper function to extract YouTube video ID
+  const getYouTubeVideoId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  // Create YouTube embed URL
+  const getEmbedUrl = (videoUrl: string) => {
+    const videoId = getYouTubeVideoId(videoUrl);
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
 
   useEffect(() => {
     // Simulate fetching video data
@@ -112,7 +126,14 @@ const VideoPage: React.FC = () => {
       <Grid container spacing={3} className="video-page">
         <Grid item xs={12} md={8}>
           <div className="video-container">
-            <img src={video.thumbnail} alt={video.title} className="video-placeholder" />
+            <iframe
+              src={getEmbedUrl(video.videoUrl)}
+              title={video.title}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="video-frame"
+            />
           </div>
           <Typography variant="h5" className="video-title">{video.title}</Typography>
           <div className="video-info">
@@ -201,11 +222,21 @@ const VideoPage: React.FC = () => {
                 className="related-video-card"
                 onClick={() => handleRelatedVideoClick(video.id)}
               >
-                <img src={video.thumbnail} alt={video.title} />
+                <div className="thumbnail-container">
+                  <img 
+                    src={`https://img.youtube.com/vi/${getYouTubeVideoId(video.videoUrl)}/maxresdefault.jpg`}
+                    onError={(e) => {
+                      // Fallback to mqdefault if maxresdefault doesn't exist
+                      (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${getYouTubeVideoId(video.videoUrl)}/mqdefault.jpg`;
+                    }}
+                    alt={video.title}
+                  />
+                  <div className="duration">{video.duration}</div>
+                </div>
                 <CardContent>
                   <Typography variant="subtitle2">{video.title}</Typography>
                   <Typography variant="caption">
-                    {video.views} views • {video.timestamp}
+                    {video.views.toLocaleString()} views • {video.timestamp}
                   </Typography>
                 </CardContent>
               </Card>
@@ -217,4 +248,4 @@ const VideoPage: React.FC = () => {
   );
 };
 
-export default VideoPage; 
+export default VideoPage;
