@@ -1,0 +1,116 @@
+.signup-page {
+  padding: 2rem 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+
+  .signup-paper {
+    padding: 2rem;
+    
+    form {
+      margin-top: 1rem;
+    }
+
+    .password-strength {
+      display: block;
+      margin: 0.5rem 0;
+
+      &.weak {
+        color: #f44336;
+      }
+
+      &.medium {
+        color: #ff9800;
+      }
+
+      &.strong {
+        color: #4caf50;
+      }
+    }
+
+    .submit-button {
+      margin: 2rem 0 1rem;
+      height: 48px;
+    }
+  }
+
+  .password-criteria {
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+
+    .password-strength {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+
+      &.weak { color: #f44336; }
+      &.medium { color: #ff9800; }
+      &.strong { color: #4caf50; }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: flex;
+        align-items: center;
+        margin: 0.25rem 0;
+        font-size: 0.875rem;
+        color: #666;
+
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+          border-radius: 50%;
+          background-color: #ddd;
+        }
+
+        &.met {
+          color: #4caf50;
+          &::before {
+            background-color: #4caf50;
+          }
+        }
+
+        &.unmet {
+          color: #666;
+          &::before {
+            background-color: #ddd;
+          }
+        }
+      }
+    }
+  }
+
+  .MuiInputAdornment-root {
+    .phone-icon {
+      color: rgba(0, 0, 0, 0.54);
+      font-size: 1.2rem;
+    }
+  }
+
+  .MuiTextField-root {
+    &[type="tel"] {
+      input {
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .signup-page {
+    padding: 1rem;
+
+    .signup-paper {
+      padding: 1rem;
+    }
+  }
+}

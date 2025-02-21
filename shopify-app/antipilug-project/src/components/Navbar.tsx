@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, InputBase } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, IconButton, InputBase, Box } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { Login as LoginIcon } from '@mui/icons-material';
 
 // Styled component for the search container
 const Search = styled('div')(({ theme }) => ({
@@ -65,21 +67,62 @@ const Navbar: React.FC = () => {
     navigate('/matchmaking');
   };
 
+  const menuItems = [
+    {
+      label: 'Home',
+      path: '/',
+    },
+    {
+      label: 'Videos',
+      path: '/videos',
+    },
+    {
+      label: 'Shop',
+      path: '/shop',
+    },
+    {
+      label: 'Profile',
+      path: '/profile',
+    },
+    {
+      label: 'Help Center',
+      path: '/help-center',
+    },
+    {
+      label: 'About',
+      path: '/about',
+    },
+    {
+      label: 'Questionnaire',
+      path: '/political-questionnaire',
+      icon: <span className="nav-icon">📝</span>,
+    },
+    {
+      label: 'Sign Up',
+      path: '/signup',
+      icon: <PersonAddIcon />,
+    },
+   
+  ];
+
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed" className="navbar">
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Button color="inherit" component={Link} to="/">Home</Button>
-          <Button color="inherit" component={Link} to="/videos">Videos</Button>
-          <Button color="inherit" component={Link} to="/shop">Shop</Button>
-          <Button color="inherit" component={Link} to="/profile">Profile</Button>
-          <Button color="inherit" component={Link} to="/help-center">Help Center</Button>
-          <Button color="inherit" component={Link} to="/about">About</Button>
-          <Button color="inherit" component={Link} to="/political-questionnaire">
-            <span className="nav-icon">📝</span>
-            <span className="nav-text">Questionnaire</span>
-          </Button>
-          
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            {menuItems.map((item) => (
+              <Button
+                key={item.path}
+                component={Link}
+                to={item.path}
+                color="inherit"
+                startIcon={item.icon}
+                className="nav-button"
+              >
+                {item.label}
+              </Button>
+            ))}
+          </Box>
         </Typography>
         <Search className={isSearchFocused ? 'focused' : ''}>
           <SearchIconWrapper>
