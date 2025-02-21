@@ -1,105 +1,280 @@
 .signup-page {
-  padding: 2rem 0;
+  padding: 2rem 1rem;
   min-height: 100vh;
   display: flex;
   align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.75), // Darker overlay for better readability
+    rgba(0, 0, 0, 0.85)
+  ),
+  url('../../assets/images/signupbackground.png'); // Update this path
+  background-repeat: repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  .MuiPaper-root {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
 
   .signup-paper {
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
     padding: 2rem;
-    
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background-color: rgba(255, 255, 255, 0.95);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 48px rgba(31, 38, 135, 0.2);
+    }
+
     form {
       margin-top: 1rem;
-    }
 
-    .password-strength {
-      display: block;
-      margin: 0.5rem 0;
+      .MuiTextField-root {
+        margin-bottom: 1rem;
 
-      &.weak {
-        color: #f44336;
+        &.optional-field {
+          opacity: 0.7;
+
+          &:focus-within {
+            opacity: 1;
+          }
+        }
+
+        input {
+          letter-spacing: 0.5px;
+        }
       }
 
-      &.medium {
-        color: #ff9800;
-      }
-
-      &.strong {
-        color: #4caf50;
-      }
-    }
-
-    .submit-button {
-      margin: 2rem 0 1rem;
-      height: 48px;
-    }
-  }
-
-  .password-criteria {
-    margin: 1rem 0;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-
-    .password-strength {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-
-      &.weak { color: #f44336; }
-      &.medium { color: #ff9800; }
-      &.strong { color: #4caf50; }
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-        display: flex;
-        align-items: center;
-        margin: 0.25rem 0;
+      .password-strength {
         font-size: 0.875rem;
-        color: #666;
+        font-weight: 600;
+        margin: 0.5rem 0;
 
-        &::before {
-          content: '';
-          display: inline-block;
-          width: 16px;
-          height: 16px;
-          margin-right: 8px;
-          border-radius: 50%;
-          background-color: #ddd;
+        &.weak {
+          color: #f44336;
         }
-
-        &.met {
+        &.medium {
+          color: #ff9800;
+        }
+        &.strong {
           color: #4caf50;
-          &::before {
-            background-color: #4caf50;
+        }
+      }
+
+      .password-criteria {
+        margin: 1rem 0;
+        padding: 1rem;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+
+        ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+
+          li {
+            display: flex;
+            align-items: center;
+            margin: 0.25rem 0;
+            font-size: 0.875rem;
+            color: #666;
+
+            &::before {
+              content: '';
+              display: inline-block;
+              width: 16px;
+              height: 16px;
+              margin-right: 8px;
+              border-radius: 50%;
+              background-color: #ddd;
+            }
+
+            &.met {
+              color: #4caf50;
+
+              &::before {
+                background-color: #4caf50;
+              }
+            }
+
+            &.unmet {
+              color: #666;
+
+              &::before {
+                background-color: #ddd;
+              }
+            }
           }
         }
+      }
 
-        &.unmet {
+      .submit-button {
+        margin: 2rem 0 1rem;
+        height: 48px;
+        background-color: #1976d2;
+        color: white;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #1565c0;
+        }
+
+        &.Mui-disabled {
+          background-color: rgba(0, 0, 0, 0.12);
+          cursor: not-allowed;
+        }
+      }
+
+      .google-button {
+        background-color: #fff;
+        color: #757575;
+        border: 1px solid #dadce0;
+        text-transform: none;
+        font-size: 1rem;
+        height: 48px;
+        margin: 1rem 0;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+
+        &:hover {
+          background-color: #f8f9fa;
+          border-color: #ccc;
+        }
+
+        .MuiButton-startIcon {
+          margin-right: 24px;
+        }
+      }
+
+      .terms-checkbox {
+        margin: 1rem 0;
+
+        .MuiFormControlLabel-label {
+          font-size: 0.875rem;
           color: #666;
-          &::before {
-            background-color: #ddd;
+        }
+      }
+
+      .divider {
+        margin: 2rem 0;
+
+        .MuiTypography-root {
+          color: rgba(0, 0, 0, 0.38);
+          font-size: 0.875rem;
+        }
+      }
+
+      .login-link {
+        margin-top: 2rem;
+        text-align: center;
+
+        a {
+          color: #1976d2;
+          text-decoration: none;
+          font-weight: 500;
+          transition: color 0.2s ease;
+
+          &:hover {
+            text-decoration: underline;
+            color: #1565c0;
           }
         }
       }
     }
   }
 
-  .MuiInputAdornment-root {
-    .phone-icon {
-      color: rgba(0, 0, 0, 0.54);
-      font-size: 1.2rem;
+  .MuiTypography-root {
+    color: #fff;
+  }
+
+  .MuiDivider-root {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .birthday-fields {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+
+    .MuiTextField-root {
+      flex: 1;
+      min-width: 80px;
+
+      .MuiSelect-select {
+        padding: 12px;
+      }
+
+      .MuiFormHelperText-root {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 0.5rem;
     }
   }
 
-  .MuiTextField-root {
-    &[type="tel"] {
-      input {
-        letter-spacing: 0.5px;
+  // Animation for custom fields
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .custom-field-container {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .custom-field {
+    animation: slideDown 0.3s ease-out;
+
+    .MuiInputBase-root {
+      background-color: #fafafa;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      &.Mui-focused {
+        background-color: #fff;
+      }
+    }
+
+    .MuiInputLabel-root {
+      color: rgba(0, 0, 0, 0.6);
+      transition: color 0.2s ease;
+
+      &.Mui-focused {
+        color: #1976d2;
+      }
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: rgba(0, 0, 0, 0.12);
+      transition: border-color 0.2s ease;
+
+      &.Mui-focused {
+        border-color: #1976d2;
       }
     }
   }
@@ -110,7 +285,16 @@
     padding: 1rem;
 
     .signup-paper {
-      padding: 1rem;
+      padding: 1.5rem;
+
+      .MuiTypography-h4 {
+        font-size: 1.75rem;
+      }
+
+      .google-button,
+      .submit-button {
+        height: 44px;
+      }
     }
   }
 }
