@@ -14,6 +14,8 @@ import FlappyBirdGame from '../pages/FlappyBirdGame';
 import VideoPage from '../pages/VideoPage';
 import PoliticalQuestionnaire from '../pages/Questionnaire/PoliticalQuestionnaire';
 import HobbiesQuestionnaire from '../pages/Questionnaire/HobbiesQuestionnaire';
+import SignUpPage from '../pages/SignUpPage';
+import LoginPage from '../pages/LoginPage';
 
 const Router: React.FC = () => {
   return (
@@ -32,6 +34,8 @@ const Router: React.FC = () => {
       <Route path="/flappy-bird-game" element={<FlappyBirdGame />} />
       <Route path="/political-questionnaire" element={<PoliticalQuestionnaire />} />
       <Route path="/hobbies-questionnaire" element={<HobbiesQuestionnaire />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/login" element={<LoginPage />} />
     </Routes>
   );
 };
