@@ -590,9 +590,9 @@ const SignUpPage: React.FC = () => {
                 </Button>
               </Grid>
               <Grid item xs={12}>
-                <Typography align="center">
+                <Typography className="login-text" align="center">
                   Already have an account?{' '}
-                  <Link component={RouterLink} to="/login">
+                  <Link className="login" component={RouterLink} to="/login">
                     Login here
                   </Link>
                 </Typography>

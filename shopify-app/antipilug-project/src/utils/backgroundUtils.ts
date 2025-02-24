@@ -1,4 +1,4 @@
-import signupBackground from './signupbackground.png';
+import signupBackground from '../assets/images/signupbackground.png';
 
 interface BackgroundConfig {
   gradient: string;
@@ -15,5 +15,9 @@ export const getBackgroundStyle = (): React.CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '2rem 1rem'
+  padding: '2rem 1rem',
+  background: `${backgroundStyles.gradient}, url(${backgroundStyles.pattern})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundAttachment: 'fixed'
 });
