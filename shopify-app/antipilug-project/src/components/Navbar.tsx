@@ -97,11 +97,7 @@ const Navbar: React.FC = () => {
       path: '/political-questionnaire',
       icon: <span className="nav-icon">📝</span>,
     },
-    {
-      label: 'Sign Up',
-      path: '/signup',
-      icon: <PersonAddIcon />,
-    },
+    
    
   ];
 
