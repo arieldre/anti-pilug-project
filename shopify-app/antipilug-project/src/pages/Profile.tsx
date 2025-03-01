@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Avatar,
   Card,
@@ -10,15 +10,17 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Tooltip,
 } from '@mui/material';
 import { MonetizationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import EditIcon from '@mui/icons-material/Edit';
 import './Profile.scss';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
-
-  // Dummy data for demonstration purposes
+  
+  // Move user data definition before using it
   const user = {
     name: 'John Doe',
     coins: 120,
@@ -36,7 +38,11 @@ const Profile: React.FC = () => {
     bio: 'Passionate about bridging political divides.',
     age: 28,
     picture: 'https://via.placeholder.com/150',
+    questionnaireChangesLeft: 3,
   };
+
+  // Initialize state after user object is defined
+  const [remainingChanges, setRemainingChanges] = useState(user.questionnaireChangesLeft);
 
   const friends = [
     { name: 'Alice', level: 3, online: true, picture: 'https://via.placeholder.com/50' },
@@ -61,6 +67,15 @@ const Profile: React.FC = () => {
 
   const handleStatisticsClick = () => {
     navigate('/statistics');
+  };
+
+  const handleQuestionnaireClick = () => {
+    if (user.level >= 3 && remainingChanges > 0) {
+      console.log('Previous remaining changes:', remainingChanges);
+      setRemainingChanges(prev => prev - 1);
+      console.log('New remaining changes:', remainingChanges - 1);
+      navigate('/questionnaires/political'); // Make sure this route exists in your router
+    }
   };
 
   return (
@@ -123,6 +138,42 @@ const Profile: React.FC = () => {
               ))}
             </CardContent>
           </Card>
+
+          {/* Conditionally render Questionnaire Card */}
+          {user.level >= 3 ? (
+            <Tooltip title={`${remainingChanges} changes remaining`} arrow placement="top">
+              <Card 
+                className={`profile-card questionnaire-card ${remainingChanges === 0 ? 'questionnaire-card-locked' : ''}`}
+                onClick={() => remainingChanges > 0 ? handleQuestionnaireClick() : null}
+                sx={{ cursor: remainingChanges > 0 ? 'pointer' : 'not-allowed' }}
+              >
+                <CardContent>
+                  <Typography variant="h6">Change my personal Questionnaire</Typography>
+                  <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {remainingChanges > 0 
+                        ? `Update your preferences - ${remainingChanges} changes remaining`
+                        : 'No more changes available'}
+                    </Typography>
+                    {remainingChanges > 0 && <EditIcon />}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Unlocks at Level 3" arrow placement="top">
+              <Card className="profile-card questionnaire-card-locked">
+                <CardContent>
+                  <Typography variant="h6" color="text.secondary">Change my personal Questionnaire</Typography>
+                  <Box sx={{ mt: 1 }}>
+                    <Typography variant="body2" color="error">
+                      Reach level 3 to unlock the ability to change your questionnaire
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Tooltip>
+          )}
         </div>
 
         {/* Friends Card */}
