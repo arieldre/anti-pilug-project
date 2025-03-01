@@ -74,7 +74,7 @@ const Profile: React.FC = () => {
       console.log('Previous remaining changes:', remainingChanges);
       setRemainingChanges(prev => prev - 1);
       console.log('New remaining changes:', remainingChanges - 1);
-      navigate('/questionnaires/political');
+      navigate('/questionnaires/political'); // Make sure this route exists in your router
     }
   };
 

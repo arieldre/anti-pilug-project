@@ -55,11 +55,9 @@ const Router: React.FC = () => {
         <Route path="/build-city" element={<BuildCity />} />
         <Route path="/flappy-bird-game" element={<FlappyBirdGame />} />
         
-        {/* Questionnaires */}
-        <Route path="/questionnaires">
-          <Route path="political" element={<PoliticalQuestionnaire />} />
-          <Route path="hobbies" element={<HobbiesQuestionnaire />} />
-        </Route>
+        {/* Questionnaires - Fix the nested routes */}
+        <Route path="/questionnaires/political" element={<PoliticalQuestionnaire />} />
+        <Route path="/questionnaires/hobbies" element={<HobbiesQuestionnaire />} />
 
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
