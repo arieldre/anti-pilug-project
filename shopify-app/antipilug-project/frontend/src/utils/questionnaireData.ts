@@ -93,6 +93,16 @@ export const politicalQuestions: QuestionnaireQuestion[] = [
     id: 10,
     text: "Environmental Sustainability – How important is it that the government imposes strict regulations on polluting industries, even if it comes at the cost of economic growth?",
     type: "scale"
+  },
+  {
+    id: 11,
+    text: "Freedom of Speech and Media – To what extent should the government regulate media and social platforms to prevent misinformation or incitement versus preserving free speech?",
+    type: "scale"
+  },
+  {
+    id: 12,
+    text: "Military Service and National Duty – Should mandatory military service be required for all citizens, including Arab and Haredi populations?",
+    type: "scale"
   }
 ];
 
