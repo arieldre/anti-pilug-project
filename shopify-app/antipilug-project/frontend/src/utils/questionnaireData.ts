@@ -141,7 +141,7 @@ export const hobbiesQuestions = [
     id: 'h7',
     text: 'How much do you enjoy talking about sports—whether watching games, playing, or following teams?',
     type: 'special',
-    specialType: 'dartBoard'
+    specialType: 'dartBoard'  // Make sure this matches exactly what the component is checking for
   },
   {
     id: 'h8',

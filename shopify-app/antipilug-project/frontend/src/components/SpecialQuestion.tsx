@@ -8,11 +8,11 @@ interface SpecialQuestionProps {
   onChange: (value: number) => void;
 }
 
-const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, onChange }) => {
-  const [stones, setStones] = useState<'left' | 'right'[]>(Array(question.options?.totalStones || 12).fill('left') as ('left' | 'right')[]);
+const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onChange }) => {
+  const [stones, setStones] = useState<('left' | 'right')[]>(Array(question.options?.totalStones || 12).fill('left'));
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
-  const [dartScore, setDartScore] = useState(0);
+  // Always start with 0 arrows for dart board
   const [arrowsThrown, setArrowsThrown] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [arrows, setArrows] = useState<{ x: number; y: number }[]>([]);
@@ -23,11 +23,27 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, onChange })
     setRightCount(stones.filter((s) => s === 'right').length);
   }, [stones]);
 
+  // For security wall, use the value prop
+  useEffect(() => {
+    if (question.specialType === 'securityWall') {
+      // Initialize stones based on value
+      if (value > 0) {
+        const newStones = [...stones];
+        for (let i = 0; i < value && i < newStones.length; i++) {
+          newStones[i] = 'right';
+        }
+        setStones(newStones);
+      }
+    }
+  }, [question.specialType, value, stones.length]); // Only run on initial render
+
   const handleStoneClick = (index: number) => {
     const newStones = [...stones];
     newStones[index] = newStones[index] === 'left' ? 'right' : 'left';
     setStones(newStones);
-    onChange(newStones.filter((s) => s === 'right').length);
+    
+    const rightCount = newStones.filter(s => s === 'right').length;
+    onChange(rightCount);
   };
 
   const throwArrow = () => {
@@ -43,26 +59,25 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, onChange })
       setCurrentArrow({ targetX, targetY });
 
       setTimeout(() => {
-        setArrows([...arrows, { x: targetX, y: targetY }]);
-        setArrowsThrown(arrowsThrown + 1);
+        const newArrows = [...arrows, { x: targetX, y: targetY }];
+        setArrows(newArrows);
+        
+        const newArrowsThrown = arrowsThrown + 1;
+        setArrowsThrown(newArrowsThrown);
         setIsAnimating(false);
         setCurrentArrow(null);
-        setDartScore(dartScore + calculateScore(targetX, targetY));
-        onChange(arrowsThrown + 1); // Update enthusiasm count
+        
+        // Only return how many arrows are thrown
+        onChange(newArrowsThrown);
       }, 600);
     }
   };
 
-  const calculateScore = (x: number, y: number) => {
-    const distance = Math.sqrt(x * x + y * y);
-    if (distance < 25) return 100;
-    if (distance < 50) return 50;
-    return 10;
-  };
-
+  // Render based on question type
   if (question.specialType === 'securityWall') {
     return (
       <div className="special-question security-wall">
+        <h3 className="question-text">{question.text}</h3>
         <div className="wall-sides">
           <div className="wall-side left">
             <div className="side-header">
@@ -94,29 +109,39 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, onChange })
     );
   }
 
-  if (question.specialType === 'dartThrow') {
+  // Handle dartBoard type
+  if (question.specialType === 'dartBoard') {
+    console.log("Rendering dart board for question:", question.id);
     return (
       <div className="special-question dart-throw">
-        <div className="text-xl font-bold my-4 px-4 py-2 bg-white rounded shadow">
-          Your enthusiasm for sports is shown by how many arrows you throw.
+        <h3 className="question-text">{question.text}</h3>
+        
+        <div className="instruction-text">
+          Show your passion for sports by throwing arrows at the target.
+          <br />
+          <small>Click the button below to throw - more throws = more interest!</small>
         </div>
-        <div className="relative w-[320px] h-[320px] bg-gray-300 rounded-lg shadow-lg">
+        
+        <div className="target-container">
           <svg width="320" height="320">
-            {/* Target */}
+            {/* Target - Fun, game-like appearance */}
             <g transform="translate(160, 160)">
-              <rect x="-102" y="-102" width="204" height="204" fill="#000000" />
-              <rect x="-100" y="-100" width="200" height="200" fill="#ff0000" />
-              <rect x="-77" y="-77" width="154" height="154" fill="#000000" />
-              <rect x="-75" y="-75" width="150" height="150" fill="#ffffff" />
-              <rect x="-52" y="-52" width="104" height="104" fill="#000000" />
-              <rect x="-50" y="-50" width="100" height="100" fill="#ff0000" />
-              <rect x="-27" y="-27" width="54" height="54" fill="#000000" />
-              <rect x="-25" y="-25" width="50" height="50" fill="#ffff00" />
+              <circle cx="0" cy="0" r="120" fill="#212121" />
+              <circle cx="0" cy="0" r="118" fill="#e53935" />  {/* Red */}
+              <circle cx="0" cy="0" r="95" fill="#212121" />
+              <circle cx="0" cy="0" r="93" fill="#43a047" />   {/* Green */}
+              <circle cx="0" cy="0" r="70" fill="#212121" />
+              <circle cx="0" cy="0" r="68" fill="#1e88e5" />   {/* Blue */}
+              <circle cx="0" cy="0" r="45" fill="#212121" />
+              <circle cx="0" cy="0" r="43" fill="#ffb300" />   {/* Yellow */}
+              <circle cx="0" cy="0" r="20" fill="#212121" />
+              <circle cx="0" cy="0" r="18" fill="#e91e63" />   {/* Pink */}
+              
+              {/* Remove the division lines */}
+              
+              {/* Bullseye with fun appearance */}
+              <circle cx="0" cy="0" r="5" fill="#f5f5f5" />
             </g>
-            
-            {/* Stand */}
-            <rect x="110" y="280" width="100" height="20" fill="#333" />
-            <rect x="140" y="270" width="40" height="10" fill="#444" />
             
             {/* Landed Arrows */}
             {arrows.map((arrow, index) => (
@@ -139,7 +164,8 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, onChange })
             {`
               .flying-arrow {
                 transform-origin: center;
-                animation: flyToTarget 0.6s cubic-bezier(0.3, 0, 0.7, 1) forwards;
+                animation: flyToTarget 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+                filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
               }
               
               @keyframes flyToTarget {
@@ -157,47 +183,75 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, onChange })
           </style>
         </div>
 
-        <div className="text-xl font-bold my-4 px-4 py-2 bg-white rounded shadow">
-          Arrows Thrown: {arrowsThrown}/10
+        <div className="arrows-count">
+          <span className="count-label">Arrows Thrown:</span> 
+          <span className="count-number">{arrowsThrown}</span> 
+          <span className="count-total">of 10</span>
         </div>
 
         <button
           onClick={throwArrow}
           disabled={arrowsThrown >= 10 || isAnimating}
-          className={`px-8 py-3 rounded-lg text-lg shadow-lg ${
-            arrowsThrown >= 10 || isAnimating
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600 text-white transform transition-transform hover:scale-105'
-          }`}
+          className="throw-button"
         >
-          {isAnimating ? 'Flying...' : 'Throw Arrow'}
+          {isAnimating ? 
+            <><span className="animation-dot"></span> Throwing...</> : 
+            <>🎯 Throw Arrow</>
+          }
         </button>
 
         {arrowsThrown >= 10 && (
-          <div className="mt-4 text-green-600 text-lg font-semibold bg-white px-4 py-2 rounded shadow">
-            All arrows thrown! Thank you for sharing your enthusiasm!
+          <div className="completion-message">
+            <span className="completion-icon">🏆</span> 
+            All arrows thrown! Your enthusiasm is impressive!
           </div>
         )}
       </div>
     );
   }
 
-  return null;
+  // Fallback for unknown special types
+  return (
+    <div className="special-question unknown-type">
+      <h3 className="question-text">{question.text}</h3>
+      <div>Unknown special question type: {question.specialType}</div>
+    </div>
+  );
 };
 
 const PixelArrow = ({ x, y }: { x: number; y: number }) => (
   <g transform={`translate(${x}, ${y})`}>
-    {/* Head (gray) */}
-    <rect x="36" y="6" width="4" height="4" fill="#666666" />
-    <rect x="32" y="4" width="4" height="8" fill="#666666" />
-    <rect x="28" y="2" width="4" height="12" fill="#666666" />
+    {/* Drop shadow */}
+    <filter id="shadow">
+      <feDropShadow dx="1" dy="1" stdDeviation="1" floodOpacity="0.3" />
+    </filter>
     
-    {/* Shaft (brown) */}
-    <rect x="8" y="6" width="20" height="4" fill="#8B4513" />
-    
-    {/* Fletching (brown & gray) */}
-    <rect x="4" y="4" width="4" height="8" fill="#A0522D" />
-    <rect x="0" y="2" width="4" height="12" fill="#666666" />
+    <g filter="url(#shadow)">
+      {/* Head (metallic) */}
+      <polygon 
+        points="40,6 32,2 32,10" 
+        fill="#9e9e9e" 
+        stroke="#616161" 
+        strokeWidth="0.5"
+      />
+      
+      {/* Shaft (wooden) */}
+      <rect x="8" y="5" width="24" height="6" fill="#8d6e63" stroke="#5d4037" strokeWidth="0.5" />
+      
+      {/* Fletching */}
+      <polygon 
+        points="8,0 8,16 0,8" 
+        fill="#f44336" 
+        stroke="#d32f2f" 
+        strokeWidth="0.5"
+      />
+      <polygon 
+        points="4,5 4,11 0,8" 
+        fill="#2196f3" 
+        stroke="#1976d2" 
+        strokeWidth="0.5"
+      />
+    </g>
   </g>
 );
 
