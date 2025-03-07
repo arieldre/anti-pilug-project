@@ -262,3 +262,153 @@ const Videos: React.FC = () => {
 };
 
 export default Videos;
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  Container, 
+  Typography, 
+  Box, 
+  Chip, 
+  Divider, 
+  Button,
+  Avatar,
+  IconButton,
+  Grid,
+  Paper,
+  CircularProgress
+} from '@mui/material';
+import {
+  ThumbUp,
+  ThumbDown,
+  Share,
+  Bookmark,
+  ArrowBack
+} from '@mui/icons-material';
+import './VideoDetail.scss';
+import { generateMockVideos } from '../utils/mockData';
+
+const VideoDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [video, setVideo] = useState<any>(null);
+  const [relatedVideos, setRelatedVideos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadVideo = async () => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Generate all videos and find the one with matching ID
+        const allVideos = generateMockVideos(1, 20);
+        const targetVideo = allVideos.find(v => v.id === parseInt(id || '1')) || allVideos[0];
+        
+        setVideo(targetVideo);
+        
+        // Filter out the current video and get related videos
+        const filteredVideos = allVideos.filter(v => v.id !== targetVideo.id);
+        setRelatedVideos(filteredVideos.slice(0, 4)); // Get 4 related videos
+        
+      } catch (error) {
+        console.error('Error loading video:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadVideo();
+  }, [id]);
+  
+  if (loading || !video) {
+    return (
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+        bgcolor="#fff"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+  
+  return (
+    <Container className="video-detail-container">
+      <Box mb={2}>
+        <Button 
+          startIcon={<ArrowBack />}
+          onClick={() => navigate('/videos')}
+        >
+          Back to Videos
+        </Button>
+      </Box>
+      
+      <div className="video-player-container">
+        <iframe
+          className="video-player"
+          src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1`}
+          title={video.title}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
+      
+      <Box mt={2}>
+        <Typography variant="h4">{video.title}</Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+          <Typography variant="body2" color="textSecondary">
+            {video.views} views • {video.timestamp}
+          </Typography>
+          <Box>
+            <IconButton>
+              <ThumbUp />
+            </IconButton>
+            <IconButton>
+              <ThumbDown />
+            </IconButton>
+            <IconButton>
+              <Share />
+            </IconButton>
+            <IconButton>
+              <Bookmark />
+            </IconButton>
+          </Box>
+        </Box>
+      </Box>
+      
+      <Divider sx={{ my: 2 }} />
+      
+      <Box display="flex" alignItems="center" mb={2}>
+        <Avatar sx={{ width: 48, height: 48, mr: 2 }}>
+          {video.channel.charAt(0)}
+        </Avatar>
+        <Box>
+          <Typography variant="subtitle1">{video.channel}</Typography>
+          <Typography variant="body2" color="textSecondary">
+            {Math.floor(Math.random() * 10) + 1}.{Math.floor(Math.random() * 9) + 1}M subscribers
+          </Typography>
+        </Box>
+        <Button 
+          variant="contained" 
+          color="primary"
+          sx={{ ml: 'auto' }}
+        >
+          Subscribe
+        </Button>
+      </Box>
+      
+      <Paper elevation={0} sx={{ bgcolor: '#f8f8f8', p: 2, mb: 3 }}>
+        <Typography variant="body1">
+          This video explores different perspectives on {video.tags[0]}.
+          Watch more content from this channel to understand their unique viewpoint.
+        </Typography>
+        <Box mt={1}>
+          {video.tags.map((tag: string, index: number) => (
+            <Chip 
+              key={index} 
+              label={tag} 
