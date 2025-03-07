@@ -93,9 +93,11 @@
       transform-origin: center;
       transition: transform 0.1s ease;
       z-index: 3;
-      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3),
+                  0 0 10px rgba(255, 215, 0, 0.4);
       animation: hover 0.8s infinite alternate ease-in-out;
       will-change: transform;
+      overflow: visible;
 
       // Wing
       &::before {
@@ -108,10 +110,10 @@
         top: 14px;
         left: -6px;
         transform-origin: right center;
-        animation: flapWing 0.2s infinite alternate ease-in-out;
+        animation: flapWing 0.15s infinite alternate ease-in-out;
         box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.2);
         will-change: transform;
-        filter: drop-shadow(0 0 5px rgba(255, 165, 0, 0.3));
+        filter: drop-shadow(0 0 5px rgba(255, 165, 0, 0.4));
       }
 
       // Tail
@@ -125,18 +127,82 @@
         right: -8px;
         top: 15px;
         transform: rotate(-10deg);
+        clip-path: polygon(
+          0% 20%, 30% 0%, 60% 20%, 
+          100% 0%, 90% 50%, 100% 100%, 
+          70% 80%, 30% 100%, 0% 80%
+        );
       }
 
+      // Cute little party hat
+      .hat {
+        position: absolute;
+        width: 16px;
+        height: 18px;
+        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        top: -12px;
+        left: 12px;
+        transform: rotate(-15deg);
+        clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+        z-index: 4;
+        
+        // Hat pom-pom
+        &::before {
+          content: '';
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          background: #FF5252;
+          border-radius: 50%;
+          top: -3px;
+          left: 5px;
+          animation: bounce 0.8s infinite alternate ease-in-out;
+        }
+        
+        // Hat stripes
+        &::after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 3px,
+            rgba(255, 255, 255, 0.3) 3px,
+            rgba(255, 255, 255, 0.3) 5px
+          );
+          clip-path: inherit;
+        }
+      }
+
+      // Eye
       .eye {
         position: absolute;
         width: 10px;
         height: 10px;
-        background: radial-gradient(circle at 30% 30%, #2C3E50, #34495E);
+        background: radial-gradient(circle at 30% 30%, #FFFFFF, #2C3E50 40%);
         border-radius: 50%;
         top: 12px;
         right: 8px;
         border: 1px solid #1a2835;
+        overflow: visible;
+        animation: blinkEye 4s infinite;
 
+        // Eyelid
+        &::before {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: #FFA500;
+          border-radius: 50%;
+          top: -100%;
+          left: 0;
+          animation: blink 4s infinite;
+        }
+        
+        // Eye shine
         &::after {
           content: '';
           position: absolute;
@@ -150,6 +216,7 @@
         }
       }
 
+      // Beak
       .beak {
         position: absolute;
         width: 15px;
@@ -160,6 +227,31 @@
         right: -5px;
         transform: rotate(-10deg);
         box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.1);
+        
+        // Beak line
+        &::after {
+          content: '';
+          position: absolute;
+          width: 8px;
+          height: 1px;
+          background: rgba(0, 0, 0, 0.3);
+          top: 6px;
+          left: 3px;
+          border-radius: 50%;
+        }
+      }
+      
+      // Cheeks
+      .cheek {
+        position: absolute;
+        width: 6px;
+        height: 4px;
+        background: rgba(255, 99, 71, 0.4);
+        border-radius: 50%;
+        top: 17px;
+        right: 12px;
+        filter: blur(1px);
+        opacity: 0.7;
       }
     }
 
@@ -262,6 +354,11 @@
             border-radius: 6px;
           }
         }
+
+        &.top::after,
+        &.bottom::after {
+          background: var(--pipe-cap-color, #006400);
+        }
       }
     }
 
@@ -312,6 +409,42 @@
       backdrop-filter: blur(3px);
       transition: opacity 0.3s ease;
     }
+
+    // Weather-specific bird styling
+    &.rainy .bird {
+      filter: saturate(0.8) brightness(0.9);
+      
+      &::before {
+        animation-duration: 0.2s; // Faster wing flapping in rain
+      }
+    }
+    
+    &.snowy .bird {
+      filter: brightness(0.95);
+      
+      &::before {
+        animation-duration: 0.25s; // Slightly faster wing flapping in snow
+      }
+    }
+    
+    &.night .bird {
+      filter: brightness(0.8) saturate(0.8);
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.4),
+                  0 0 10px rgba(100, 100, 255, 0.3);
+    }
+    
+    &.foggy .bird {
+      filter: contrast(0.9) brightness(0.95);
+    }
+    
+    &.windy .bird {
+      &::before {
+        animation-duration: 0.12s; // Much faster wing flapping in wind
+      }
+      .feather-tuft {
+        animation: tuftsWindy 0.6s infinite alternate ease-in-out;
+      }
+    }
   }
 }
 
@@ -323,11 +456,11 @@
 
 @keyframes hover {
   0% { 
-    transform: translateY(-2px) rotate(var(--rotation));
+    transform: translateY(-2px) rotate(var(--rotation, 0deg));
     filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
   }
   100% { 
-    transform: translateY(2px) rotate(var(--rotation));
+    transform: translateY(2px) rotate(var(--rotation, 0deg));
     filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
   }
 }
@@ -338,13 +471,33 @@
     filter: brightness(1);
   }
   50% {
-    transform: rotate(-15deg) scaleY(0.9);
-    filter: brightness(1.1);
+    transform: rotate(-20deg) scaleY(0.85);
+    filter: brightness(1.15);
   }
   100% { 
-    transform: rotate(-25deg) scaleY(0.8);
-    filter: brightness(1.2);
+    transform: rotate(-30deg) scaleY(0.75);
+    filter: brightness(1.3);
   }
+}
+
+@keyframes blink {
+  0%, 48%, 52%, 100% { top: -100%; }
+  50% { top: 0; }
+}
+
+@keyframes blinkEye {
+  0%, 48%, 52%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes tuftsWave {
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(5deg); }
+}
+
+@keyframes tuftsWindy {
+  0% { transform: rotate(-15deg); }
+  100% { transform: rotate(15deg); }
 }
 
 @keyframes float {
@@ -395,6 +548,11 @@
   }
 }
 
+@keyframes collect {
+  0% { transform: scale(1) rotate(0); opacity: 1; }
+  100% { transform: scale(2) rotate(360deg); opacity: 0; }
+}
+
 @media (max-width: 768px) {
   .flappy-bird-wrapper {
     padding: 10px;
@@ -418,4 +576,446 @@
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     }
   }
+}
+
+// Coin styles
+.coin {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+  border: 2px solid #FF8C00;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); // Brighter glow
+  z-index: 2;
+  transition: opacity 0.2s;
+  animation: coinPulse 2s infinite alternate ease-in-out; // Add pulsing effect
+  
+  &::before {
+    content: '$'; // Show the value instead of $
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 0 2px #000;
+  }
+  
+  &.collected {
+    animation: collect 0.3s forwards;
+  }
+}
+
+// Add this new animation for coins
+@keyframes coinPulse {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
+  100% { transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 215, 0, 1); }
+}
+
+// Style for coin counter
+.coin-count { 
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFD700;
+  text-shadow: 0 0 3px black;
+  z-index: 10;
+}
+
+// Weather styles
+.game-container {
+  &.sunny { 
+    background: linear-gradient(180deg, #87CEEB 0%, #64b5f6 50%, #1E90FF 100%); 
+    &::before { opacity: 1; } // Sun fully visible
+  }
+  
+  &.rainy { 
+    background: linear-gradient(180deg, #607D8B 0%, #546E7A 50%, #455A64 100%);
+    &::before { opacity: 0.3; filter: blur(5px); } // Sun dimmed
+  }
+  
+  &.snowy { 
+    background: linear-gradient(180deg, #B0BEC5 0%, #90A4AE 50%, #78909C 100%);
+    &::before { opacity: 0.6; filter: blur(3px); } // Sun partially visible
+  }
+  
+  &.foggy { 
+    background: linear-gradient(180deg, #B0BEC5 0%, #CFD8DC 50%, #ECEFF1 100%);
+    &::before { opacity: 0.4; filter: blur(8px); } // Sun very blurry
+  }
+  
+  &.windy { 
+    background: linear-gradient(180deg, #90CAF9 0%, #64B5F6 50%, #42A5F5 100%);
+    &::before { opacity: 0.8; } // More visible particles
+  }
+  
+  &.night { 
+    background: linear-gradient(180deg, #1A237E 0%, #303F9F 50%, #3949AB 100%);
+    &::before {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+      filter: blur(1px);
+      top: 40px;
+      right: 60px;
+      width: 60px;
+      height: 60px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.2);
+    } // Moon instead of sun
+    .cloud { opacity: 0.6; } // Darker clouds
+  }
+}
+
+// Weather particles
+.weather-particle {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  
+  &.rainy {
+    width: 2px;
+    height: 15px;
+    background: rgba(255, 255, 255, 0.7);
+    transform: rotate(15deg);
+    border-radius: 0 0 1px 1px;
+  }
+  
+  &.snowy {
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+  }
+  
+  &.foggy {
+    width: 120px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    filter: blur(8px);
+  }
+  
+  &.windy {
+    width: 30px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.5);
+    transform: rotate(0deg);
+  }
+}
+
+// Weather indicator
+.weather-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 16px;
+  color: white;
+  text-shadow: 0 0 3px black;
+  z-index: 10;
+  font-family: 'Arial', sans-serif;
+  text-transform: capitalize;
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+}
+
+// Add the feather styling
+.feather {
+  position: absolute;
+  border-radius: 50% 50% 0 50%;
+  box-shadow: 0 0 3px rgba(255, 215, 0, 0.3);
+  pointer-events: none;
+  will-change: transform;
+  z-index: 2;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 70%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), transparent);
+    top: 10%;
+    left: 10%;
+    border-radius: 50%;
+  }
+  
+  // Add different animation for each weather type
+  .game-container.rainy & {
+    filter: saturate(0.8) brightness(0.9);
+    animation: featherFallRain 3s forwards;
+  }
+  
+  .game-container.snowy & {
+    filter: brightness(0.95);
+    animation: featherFallSlow 4s forwards;
+  }
+  
+  .game-container.night & {
+    filter: brightness(0.8) saturate(0.8);
+    box-shadow: 0 0 5px rgba(100, 100, 255, 0.3);
+    animation: featherFallGlow 3.5s forwards;
+  }
+  
+  .game-container.foggy & {
+    filter: contrast(0.9) brightness(0.95);
+    animation: featherFallFog 4s forwards;
+  }
+  
+  .game-container.windy & {
+    animation: featherFallWind 2s forwards;
+  }
+  
+  .game-container.sunny & {
+    animation: featherFall 3s forwards;
+  }
+}
+
+@keyframes featherFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translateY(100px) rotate(360deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallRain {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translateY(150px) rotate(270deg) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallSlow {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(40px) translateX(20px) rotate(180deg) scale(0.8);
+  }
+  100% {
+    transform: translateY(120px) translateX(-20px) rotate(360deg) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallFog {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    transform: translateY(100px) rotate(360deg) scale(0.5);
+    filter: blur(2px);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallWind {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(30px) translateX(40px) rotate(180deg) scale(0.7);
+  }
+  100% {
+    transform: translateY(80px) translateX(100px) rotate(360deg) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallGlow {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    box-shadow: 0 0 5px rgba(100, 100, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(100, 100, 255, 0.5);
+  }
+  100% {
+    transform: translateY(100px) rotate(360deg) scale(0.5);
+    opacity: 0;
+    box-shadow: 0 0 3px rgba(100, 100, 255, 0.2);
+  }
+}
+
+// Add this new animation
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+// Weather-specific pipe styles with more distinct colors
+.pipes {
+  // Base pipe styling reset
+  .pipe {
+    transition: background 0.3s ease, border-color 0.3s ease;
+    
+    &::after {
+      transition: background 0.3s ease;
+    }
+    
+    // Disable the default shine animation first
+    &::before {
+      animation: none !important;
+    }
+  }
+
+  // SUNNY - green pipes
+  &.weather-sunny .pipe {
+    background: linear-gradient(90deg, 
+      #228B22 0%, 
+      #32CD32 50%,
+      #228B22 100%
+    ) !important;
+    border-color: #2E7D32 !important;
+    
+    &::after { 
+      background: #2E7D32 !important; 
+    }
+    
+    // Gentle shine for sunny weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.15) 50%,
+        transparent 100%
+      ) !important;
+      
+    }
+  }
+  
+  // RAINY - blue pipes
+  &.weather-rainy .pipe {
+    background: linear-gradient(90deg, 
+      #0D47A1 0%, 
+      #1976D2 50%,
+      #0D47A1 100%
+    ) !important;
+    border-color: #0D47A1 !important;
+    
+    &::after { 
+      background: #0D47A1 !important; 
+    }
+    
+    // Wet shine for rainy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.2) 50%,
+        transparent 100%
+      ) !important;
+      
+    }
+  }
+  
+  // SNOWY - ice blue pipes
+  &.weather-snowy .pipe {
+    background: linear-gradient(90deg, 
+      #4FC3F7 0%, 
+      #81D4FA 50%,
+      #4FC3F7 100%
+    ) !important;
+    border-color: #29B6F6 !important;
+    
+    &::after { 
+      background: #29B6F6 !important; 
+    }
+    
+    // Frosty shine for snowy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.25) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+  
+  // FOGGY - gray pipes
+  &.weather-foggy .pipe {
+    background: linear-gradient(90deg, 
+      #757575 0%, 
+      #9E9E9E 50%,
+      #757575 100%
+    ) !important;
+    border-color: #616161 !important;
+    
+    &::after { 
+      background: #616161 !important; 
+    }
+    
+    // Subtle, diffused shine for foggy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.1) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+  
+  // WINDY - tan pipes
+  &.weather-windy .pipe {
+    background: linear-gradient(90deg, 
+      #8D6E63 0%, 
+      #BCAAA4 50%,
+      #8D6E63 100%
+    ) !important;
+    border-color: #795548 !important;
+    
+    &::after { 
+      background: #795548 !important; 
+    }
+    
+    // Quick shine for windy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.12) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+  
+  // NIGHT - dark blue pipes
+  &.weather-night .pipe {
+    background: linear-gradient(90deg, 
+      #1A237E 0%, 
+      #303F9F 50%,
+      #1A237E 100%
+    ) !important;
+    border-color: #0D1752 !important;
+    
+    &::after { 
+      background: #0D1752 !important; 
+    }
+    
+    // Subtle moonlight shine for night
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.08) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+}
+
+// Add a gentler shine animation for night
+@keyframes pipeShineNight {
+  0% { transform: translateX(-100%); opacity: 0.3; }
+  50% { opacity: 0.7; }
+  100% { transform: translateX(100%); opacity: 0.3; }
 }
