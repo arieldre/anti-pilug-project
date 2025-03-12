@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Avatar,
   Card,
@@ -16,10 +17,57 @@ import { MonetizationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import './Profile.scss';
+import { contentApi, userApi, questionApi } from '../services/api';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [answers, setAnswers] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      setLoading(true);
+      try {
+        // Get user ID from auth context or local storage
+        const userId = localStorage.getItem('userId'); // or context
+        
+        if (!userId) {
+          throw new Error('User not authenticated');
+        }
+        
+        const response = await axios.get(`/api/users/${userId}`);
+        setUserProfile(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+        setError('Failed to load profile. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await contentApi.getContent();
+        setContent(response.data);
+      } catch (error) {
+        console.error('Error fetching content:', error);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
   // Move user data definition before using it
   const user = {
     name: 'John Doe',
@@ -75,6 +123,40 @@ const Profile: React.FC = () => {
       setRemainingChanges(prev => prev - 1);
       console.log('New remaining changes:', remainingChanges - 1);
       navigate('/questionnaires/political'); // Make sure this route exists in your router
+    }
+  };
+
+  const handleAnswerChange = (questionId: number, value: number) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
+
+  const handleSubmitQuestionnaire = async () => {
+    setSubmitting(true);
+    try {
+      const userId = localStorage.getItem('userId'); // or from context
+      
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      
+      const response = await axios.post('/api/user-questions', {
+        userId,
+        answers: Object.entries(answers).map(([questionId, value]) => ({
+          questionId: parseInt(questionId),
+          value: value
+        }))
+      });
+      
+      // Handle successful submission - maybe show a success message
+      setSubmitError(null);
+    } catch (err) {
+      console.error('Error submitting questionnaire:', err);
+      setSubmitError('Failed to submit your answers. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 

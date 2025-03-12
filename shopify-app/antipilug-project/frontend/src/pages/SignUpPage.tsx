@@ -20,6 +20,7 @@ import { Visibility, VisibilityOff, Google as GoogleIcon } from '@mui/icons-mate
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import './styles/SignUpPage.scss';
 import { getBackgroundStyle } from '../utils/backgroundUtils';
+import axios from 'axios';
 
 // Initialize Google OAuth - add this before component
 const loadGoogleScript = () => {
@@ -136,6 +137,7 @@ const SignUpPage: React.FC = () => {
     hasNumber: false,
     hasSpecial: false,
   });
+  const [error, setError] = useState<string | null>(null);
 
   const checkPasswordStrength = (password: string): 'weak' | 'medium' | 'strong' | null => {
     const criteria = {
@@ -215,10 +217,17 @@ const SignUpPage: React.FC = () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        navigate('/questionnaire'); // Navigate to questionnaire after signup
-      } catch (error) {
-        console.error('Signup error:', error);
+        const response = await axios.post('/api/users/signup', formData);
+    
+        // Store user data in localStorage or context
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('token', response.data.token);
+        
+        // Redirect to profile or home page
+        navigate('/profile');
+      } catch (err) {
+        console.error('Error signing up:', err);
+        setError('Failed to create account. Please try again.');
       } finally {
         setLoading(false);
       }
