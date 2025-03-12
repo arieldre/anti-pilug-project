@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { 
   Box, 
   Container, 
@@ -18,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import ShareIcon from '@mui/icons-material/Share';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import './styles/Home.scss';
+import { contentApi, userApi, questionApi } from '../services/api';
 
 interface ContentItem {
   id: number;
@@ -35,102 +37,19 @@ const Home: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulate fetching content
   useEffect(() => {
-    const fetchContent = async () => {
-      setLoading(true);
-      // TODO: Replace with actual API call
-      const mockContent: ContentItem[] = [
-        {
-          id: 1,
-          type: 'video',
-          title: 'Understanding Anti-Plugging Techniques',
-          description: 'Learn about the latest anti-plugging strategies and their implementation.',
-          imageUrl: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-          date: '2024-02-15',
-          link: '/video/1',
-          tags: ['security', 'anti-plug', 'tutorial']
-        },
-        {
-          id: 2,
-          type: 'video',
-          title: 'Advanced Security Measures in Gaming',
-          description: 'Deep dive into protecting gaming platforms from unauthorized modifications.',
-          imageUrl: 'https://img.youtube.com/vi/JZYZoQQ6LJQ/maxresdefault.jpg',
-          date: '2024-02-14',
-          link: '/video/2',
-          tags: ['gaming', 'security', 'advanced']
-        },
-        {
-          id: 3,
-          type: 'news',
-          title: 'Major Security Breach Prevention Success',
-          description: 'How a leading gaming company prevented a massive security breach using anti-plugging solutions.',
-          imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b',
-          date: '2024-02-13',
-          link: '/news/1',
-          tags: ['news', 'success-story', 'case-study']
-        },
-        {
-          id: 4,
-          type: 'video',
-          title: 'Real-time Protection Systems',
-          description: 'Implementing real-time monitoring and protection against unauthorized modifications.',
-          imageUrl: 'https://img.youtube.com/vi/Y8Wp3dafaMQ/maxresdefault.jpg',
-          date: '2024-02-12',
-          link: '/video/3',
-          tags: ['real-time', 'monitoring', 'protection']
-        },
-        {
-          id: 5,
-          type: 'news',
-          title: 'Industry Standards Update 2024',
-          description: 'New security standards and regulations for anti-plugging measures in software.',
-          imageUrl: 'https://images.unsplash.com/photo-1516321165247-4aa89a48be28',
-          date: '2024-02-11',
-          link: '/news/2',
-          tags: ['standards', 'regulations', 'industry']
-        },
-        {
-          id: 6,
-          type: 'video',
-          title: 'Secure Code Implementation',
-          description: 'Best practices for implementing secure code against unauthorized modifications.',
-          imageUrl: 'https://img.youtube.com/vi/K7gLvB0ve-Y/maxresdefault.jpg',
-          date: '2024-02-10',
-          link: '/video/4',
-          tags: ['coding', 'best-practices', 'implementation']
-        },
-        {
-          id: 7,
-          type: 'news',
-          title: 'Anti-Plugging Technology Trends',
-          description: 'Latest trends and innovations in anti-plugging security measures.',
-          imageUrl: '/assets/trends-2024.jpg',
-          date: '2024-02-09',
-          link: '/news/3',
-          tags: ['trends', 'innovation', 'technology']
-        },
-        {
-          id: 8,
-          type: 'talk',
-          title: 'Security Conference Keynote 2024',
-          description: 'Highlights from the annual security conference focusing on anti-plugging solutions.',
-          imageUrl: '/assets/conference-2024.jpg',
-          date: '2024-02-08',
-          link: '/talk/1',
-          tags: ['conference', 'keynote', 'industry-event']
-        }
-      ];
-      
-      setTimeout(() => {
-        setContent(mockContent);
-        setLoading(false);
-      }, 1000);
+    const fetchData = async () => {
+      try {
+        const response = await contentApi.getContent();
+        setContent(response.data);
+      } catch (error) {
+        console.error('Error fetching content:', error);
+      }
     };
-
-    fetchContent();
+    
+    fetchData();
   }, []);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -190,6 +109,10 @@ const Home: React.FC = () => {
         {loading ? (
           <Box display="flex" justifyContent="center" p={4}>
             <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box display="flex" justifyContent="center" p={4}>
+            <Typography color="error">{error}</Typography>
           </Box>
         ) : (
           <Grid container spacing={3}>

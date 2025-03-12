@@ -1,5 +1,7 @@
 // filepath: /c:/Users/arara/OneDrive/שולחן העבודה/projectantipilug/shopify-app/shopify-app/antipilug-project/src/pages/Videos.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Grid, 
   Card, 
@@ -30,21 +32,24 @@ import { useNavigate } from 'react-router-dom';
 
 // Move mockVideos to a separate file to keep component clean
 import { generateMockVideos } from '../utils/mockData.ts';
+import { contentApi, userApi, questionApi } from '../services/api';
 
 const VIDEOS_PER_PAGE = 12;
 
 const Videos: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [selectedFilters, setSelectedFilters] = useState({
-    subject: '',
-    politicalSide: '',
-    country: '',
-    sortBy: 'recent'
+    subject: searchParams.get('subject') || '',
+    politicalSide: searchParams.get('perspective') || '',
+    country: searchParams.get('country') || '',
+    sortBy: searchParams.get('sortBy') || 'newest'
   });
 
   const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -114,6 +119,44 @@ const Videos: React.FC = () => {
   const handleVideoClick = (videoId: number) => {
     navigate(`/video/${videoId}`);
   };
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      setLoading(true);
+      try {
+        // Build query parameters from filters
+        const params = new URLSearchParams();
+        if (selectedFilters.subject) params.append('subject', selectedFilters.subject);
+        if (selectedFilters.politicalSide) params.append('politicalSide', selectedFilters.politicalSide);
+        if (selectedFilters.country) params.append('country', selectedFilters.country);
+        if (selectedFilters.sortBy) params.append('sortBy', selectedFilters.sortBy);
+        
+        const response = await axios.get(`/api/videos?${params.toString()}`);
+        setVideos(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching videos:', err);
+        setError('Failed to load videos. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, [selectedFilters]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await contentApi.getContent();
+        setContent(response.data);
+      } catch (error) {
+        console.error('Error fetching content:', error);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   if (loading) {
     return (
