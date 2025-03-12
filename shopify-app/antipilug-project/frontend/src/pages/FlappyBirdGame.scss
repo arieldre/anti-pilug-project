@@ -1,0 +1,1773 @@
+.flappy-bird-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; // This is good as-is
+  height: 100%;
+  padding: 60px 20px 20px 20px; // Reduced from 80px to 60px
+  background: transparent;
+
+  // For mobile devices, adjust padding as needed
+  @media (max-width: 768px) {
+    padding: 55px 10px 10px 10px; // Reduced from 70px to 55px
+  }
+
+  // For very small screens
+  @media (max-width: 480px) {
+    padding: 50px 5px 5px 5px; // Reduced from 60px to 50px
+  }
+
+  .game-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: background 1s ease;
+
+    &.sunny, &.rainy, &.snowy, &.foggy, &.windy, &.night {
+      transition: background 1s ease;
+    }
+
+    &.weather-transition {
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: transparent;
+        z-index: 10;
+        pointer-events: none;
+        animation: weather-transition 1s ease-in-out;
+      }
+    }
+
+    .mountain {
+      position: absolute;
+      clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+      opacity: 0.7; // Reduce opacity further (was 0.5)
+
+      .mountain-cap {
+        position: absolute;
+        top: 0;
+        left: 10%;
+        width: 80%;
+        height: 30%;
+        clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+        box-shadow: none;
+        opacity: 0.9; // Make snow caps slightly more transparent
+      }
+    }
+
+    .hill {
+      position: absolute;
+      border-radius: 50% 50% 0 0;
+      opacity: 0.4; // Reduce opacity further (was 0.4)
+    }
+
+    // Weather-specific styling enhancements
+    &.rainy {
+      .cloud {
+        filter: brightness(0.8) contrast(1.2);
+      }
+    }
+
+    &.snowy {
+      .mountain, .hill {
+        filter: brightness(1.1);
+      }
+    }
+
+    &.foggy {
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.15);
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .mountain, .hill {
+        opacity: 0.2;
+      }
+    }
+
+    &.night {
+      .score, .high-score, .level, .weather-indicator, .message {
+        color: rgba(255,255,255,0.95);
+        text-shadow: 0 0 5px rgba(0,0,255,0.7);
+      }
+
+      .mountain-cap {
+        opacity: 0.8;
+      }
+    }
+
+    &.windy {
+      .cloud {
+        animation: sway 5s infinite alternate ease-in-out;
+      }
+
+      .bird {
+        animation: slight-sway 2s infinite alternate ease-in-out;
+      }
+    }
+
+    position: relative;
+    margin: 0 auto;
+    background: linear-gradient(180deg, 
+      #87CEEB 0%, 
+      #64b5f6 50%,
+      #1E90FF 100%
+    );
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+
+    // Sun/Moon effect
+    &::before {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, 
+        rgba(255, 236, 179, 0.9) 0%,
+        rgba(255, 236, 179, 0.2) 70%,
+        transparent 100%
+      );
+      top: 40px;
+      right: 60px;
+      border-radius: 50%;
+      filter: blur(2px);
+      animation: glow 4s infinite alternate ease-in-out;
+      z-index: 1;
+    }
+
+    // Background particles
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 30px 30px, 15px 15px;
+      animation: particleFloat 20s linear infinite;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    &.flash {
+      animation: flash 0.1s linear;
+    }
+
+    // Background birds
+    .bg-bird {
+      position: absolute;
+      z-index: 1;
+      transform-origin: center;
+      animation: birdFloat 2s infinite alternate ease-in-out;
+      pointer-events: none;
+      
+      // Randomize animation timing
+      &:nth-of-type(3n) { animation-duration: 2.5s; }
+      &:nth-of-type(3n+1) { animation-duration: 1.8s; }
+      &:nth-of-type(3n+2) { animation-duration: 3s; }
+      
+      // Main bird body - similar to main bird
+      .bg-bird-body {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50% 60% 40% 40%;
+        box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.3);
+        z-index: 1;
+      }
+      
+      // Wing - match main bird wing style
+      .bg-bird-wing {
+        position: absolute;
+        width: 55%;
+        height: 40%;
+        background: inherit;
+        border-radius: 60% 40% 40% 60%;
+        top: 35%;
+        left: -15%;
+        transform-origin: right center;
+        z-index: 2;
+        opacity: 0.9;
+        
+        // Inherit background with a darker shade
+        background: rgba(0, 0, 0, 0.2);
+      }
+      
+      // Head
+      .bg-bird-head {
+        position: absolute;
+        width: 40%;
+        height: 50%;
+        border-radius: 50%;
+        right: -10%;
+        top: 20%;
+        z-index: 2;
+        background: inherit;
+        // Create semielliptical shape
+        transform: scaleX(0.8);
+      }
+      
+      // Eye
+      .bg-bird-eye {
+        position: absolute;
+        width: 15%;
+        height: 15%;
+        background: #fff;
+        border-radius: 50%;
+        right: 0;
+        top: 30%;
+        z-index: 3;
+        
+        // Pupil
+        &::after {
+          content: '';
+          position: absolute;
+          width: 50%;
+          height: 50%;
+          background: #000;
+          border-radius: 50%;
+          top: 25%;
+          right: 25%;
+        }
+      }
+      
+      // Beak
+      .bg-bird-beak {
+        position: absolute;
+        width: 30%;
+        height: 20%;
+        background: #E67E22;
+        border-radius: 40% 60% 30% 30%;
+        right: -18%;
+        top: 40%;
+        z-index: 2;
+        transform: rotate(-5deg);
+      }
+      
+      // Tail
+      .bg-bird-tail {
+        position: absolute;
+        width: 30%;
+        height: 35%;
+        left: -5%;
+        top: 35%;
+        background: inherit;
+        border-radius: 0 50% 50% 0;
+        transform: rotate(-10deg);
+        opacity: 0.9;
+        clip-path: polygon(
+          0% 20%, 30% 0%, 60% 20%, 
+          100% 0%, 90% 50%, 100% 100%, 
+          70% 80%, 30% 100%, 0% 80%
+        );
+      }
+      
+      // Wing animation
+      &.wing-position-0 .bg-bird-wing {
+        transform: rotate(0deg) scaleY(1);
+      }
+      
+      &.wing-position-1 .bg-bird-wing {
+        transform: rotate(-15deg) scaleY(0.9);
+      }
+      
+      &.wing-position-2 .bg-bird-wing {
+        transform: rotate(-25deg) scaleY(0.8);
+      }
+      
+      &.wing-position-3 .bg-bird-wing {
+        transform: rotate(-15deg) scaleY(0.9);
+      }
+      
+      // Weather effects
+      .game-container.night & {
+        filter: brightness(0.7);
+        
+        .bg-bird-eye {
+          background: #FFCC80;
+          
+          &::after {
+            background: #2C3E50;
+          }
+        }
+      }
+      
+      .game-container.foggy & {
+        opacity: 0.6;
+        filter: blur(1px);
+      }
+    }
+
+    .bird {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      left: 50px;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      border-radius: 50% 60% 40% 40%;
+      transform-origin: center;
+      transition: transform 0.1s ease;
+      z-index: 3;
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.3),
+                  0 0 10px rgba(255, 215, 0, 0.4);
+      animation: hover 0.8s infinite alternate ease-in-out;
+      will-change: transform;
+      overflow: visible;
+
+      // Wing
+      &::before {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 16px;
+        background: linear-gradient(90deg, #FFA500 0%, #FF8C00 100%);
+        border-radius: 60% 40% 40% 60%;
+        top: 14px;
+        left: -6px;
+        transform-origin: right center;
+        animation: flapWing 0.15s infinite alternate ease-in-out;
+        box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.2);
+        will-change: transform;
+        filter: drop-shadow(0 0 5px rgba(255, 165, 0, 0.4));
+      }
+
+      // Tail
+      &::after {
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 12px;
+        background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+        border-radius: 0 50% 50% 0;
+        right: -8px;
+        top: 15px;
+        transform: rotate(-10deg);
+        clip-path: polygon(
+          0% 20%, 30% 0%, 60% 20%, 
+          100% 0%, 90% 50%, 100% 100%, 
+          70% 80%, 30% 100%, 0% 80%
+        );
+      }
+
+      // Cute little party hat
+      .hat {
+        position: absolute;
+        width: 16px;
+        height: 18px;
+        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        top: -15px; // Moved slightly higher (was -12px)
+        left: 15px; // Moved slightly more right (was 12px)
+        transform: rotate(0deg); // Removed the rotation (was -15deg)
+        clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+        z-index: 4;
+        
+        // Hat pom-pom
+        &::before {
+          content: '';
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          background: #FF5252;
+          border-radius: 50%;
+          top: -3px;
+          left: 5px;
+          animation: bounce 0.8s infinite alternate ease-in-out;
+        }
+        
+        // Hat stripes
+        &::after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: repeating-linear-gradient(
+            -45deg, 
+            transparent, 
+            transparent 3px, 
+            rgba(255,255,255,0.3) 3px, 
+            rgba(255,255,255,0.3) 6px
+          );
+          clip-path: inherit;
+        }
+      }
+
+      // Eye
+      .eye {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: radial-gradient(circle at 30% 30%, #FFFFFF, #2C3E50 40%);
+        border-radius: 50%;
+        top: 12px;
+        right: 8px;
+        border: 1px solid #1a2835;
+        overflow: visible;
+        animation: blinkEye 4s infinite;
+
+        // Eyelid
+        &::before {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: #FFA500;
+          border-radius: 50%;
+          top: -100%;
+          left: 0;
+          animation: blink 4s infinite;
+        }
+        
+        // Eye shine
+        &::after {
+          content: '';
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: white;
+          border-radius: 50%;
+          top: 1px;
+          right: 1px;
+          box-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+        }
+      }
+
+      // Beak
+      .beak {
+        position: absolute;
+        width: 15px;
+        height: 10px;
+        background: linear-gradient(45deg, #E67E22 0%, #D35400 100%);
+        border-radius: 50% 50% 30% 30%;
+        top: 15px;
+        right: -5px;
+        transform: rotate(-10deg);
+        box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.1);
+        
+        // Beak line
+        &::after {
+          content: '';
+          position: absolute;
+          width: 8px;
+          height: 1px;
+          background: rgba(0, 0, 0, 0.3);
+          top: 6px;
+          left: 3px;
+          border-radius: 50%;
+        }
+      }
+      
+      // Cheeks
+      .cheek {
+        position: absolute;
+        width: 6px;
+        height: 4px;
+        background: rgba(255, 99, 71, 0.4);
+        border-radius: 50%;
+        top: 17px;
+        right: 12px;
+        filter: blur(1px);
+        opacity: 0.7;
+      }
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      pointer-events: none;
+      transition: transform 0.016s linear;
+      z-index: 1;
+      animation: float 3s infinite ease-in-out;
+      filter: blur(2px);
+      opacity: 0.9;
+      will-change: transform;
+
+      &::before, &::after {
+        content: '';
+        position: absolute;
+        background: inherit;
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+      }
+
+      &::before {
+        width: 60%;
+        height: 100%;
+        top: -50%;
+        left: 20%;
+      }
+
+      &::after {
+        width: 40%;
+        height: 80%;
+        top: -30%;
+        right: 20%;
+      }
+    }
+
+    .pipes {
+      .pipe {
+        position: absolute;
+        width: 60px;
+        background: linear-gradient(90deg, 
+          #228B22 0%, 
+          #32CD32 50%,
+          #228B22 100%
+        );
+        border: 4px solid #006400;
+        box-sizing: border-box;
+        transition: transform 0.016s linear;
+        will-change: transform;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255,255,255,0.1) 50%,
+            transparent 100%
+          );
+          animation: pipeShine 2s linear infinite;
+        }
+
+        &.top {
+          top: 0;
+          border-bottom: none;
+          border-radius: 0 0 4px 4px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: -8px;
+            right: -8px;
+            height: 12px;
+            background: #006400;
+            border-radius: 6px;
+          }
+        }
+
+        &.bottom {
+          bottom: 0;
+          border-top: none;
+          border-radius: 4px 4px 0 0;
+          box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -8px;
+            right: -8px;
+            height: 12px;
+            background: #006400;
+            border-radius: 6px;
+          }
+        }
+
+        &.top::after,
+        &.bottom::after {
+          background: var(--pipe-cap-color, #006400);
+        }
+      }
+    }
+
+    .score, .high-score, .level {
+      position: absolute;
+      color: white;
+      font-size: 24px;
+      font-family: 'Arial', sans-serif;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      z-index: 4;
+      padding: 10px;
+    }
+
+    .score { top: 20px; left: 20px; }
+    .high-score { top: 20px; right: 20px; }
+    .level { top: 50px; left: 20px; }
+
+    .message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      pointer-events: none;
+      z-index: 5;
+      line-height: 1.5;
+      backdrop-filter: blur(3px);
+    }
+
+    .pause-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(3px);
+      transition: opacity 0.3s ease;
+    }
+
+    // Weather-specific bird styling
+    &.rainy .bird {
+      filter: saturate(0.8) brightness(0.9);
+      
+      &::before {
+        animation-duration: 0.2s; // Faster wing flapping in rain
+      }
+    }
+    
+    &.snowy .bird {
+      filter: brightness(0.95);
+      
+      &::before {
+        animation-duration: 0.25s; // Slightly faster wing flapping in snow
+      }
+    }
+    
+    &.night .bird {
+      filter: brightness(0.8) saturate(0.8);
+      box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.4),
+                  0 0 10px rgba(100, 100, 255, 0.3);
+    }
+    
+    &.foggy .bird {
+      filter: contrast(0.9) brightness(0.95);
+    }
+    
+    &.windy .bird {
+      &::before {
+        animation-duration: 0.12s; // Much faster wing flapping in wind
+      }
+      .feather-tuft {
+        animation: tuftsWindy 0.6s infinite alternate ease-in-out;
+      }
+    }
+  }
+}
+
+@keyframes flash {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(2); }
+  100% { filter: brightness(1); }
+}
+
+@keyframes hover {
+  0% { 
+    transform: translateY(-2px) rotate(var(--rotation, 0deg));
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+  }
+  100% { 
+    transform: translateY(2px) rotate(var(--rotation, 0deg));
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+  }
+}
+
+@keyframes flapWing {
+  0% { 
+    transform: rotate(0deg) scaleY(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: rotate(-20deg) scaleY(0.85);
+    filter: brightness(1.15);
+  }
+  100% { 
+    transform: rotate(-30deg) scaleY(0.75);
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes blink {
+  0%, 48%, 52%, 100% { top: -100%; }
+  50% { top: 0; }
+}
+
+@keyframes blinkEye {
+  0%, 48%, 52%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes tuftsWave {
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(5deg); }
+}
+
+@keyframes tuftsWindy {
+  0% { transform: rotate(-15deg); }
+  100% { transform: rotate(15deg); }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0);
+    filter: blur(2px);
+  }
+  50% { 
+    transform: translateY(-6px);
+    filter: blur(1.5px);
+  }
+}
+
+@keyframes pipeShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes glow {
+  0% { 
+    transform: scale(1);
+    filter: blur(2px);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(1.1);
+    filter: blur(3px);
+    opacity: 1;
+  }
+}
+
+@keyframes particleFloat {
+  0% { background-position: 0 0; }
+  100% { background-position: 100px 100px; }
+}
+
+@keyframes flyAcross {
+  0% {
+    left: -20px;
+    transform: translateY(0) scaleX(1);
+  }
+  50% {
+    transform: translateY(20px) scaleX(1);
+  }
+  100% {
+    left: calc(100% + 20px);
+    transform: translateY(0) scaleX(1);
+  }
+}
+
+@keyframes collect {
+  0% { transform: scale(1) rotate(0); opacity: 1; }
+  100% { transform: scale(2) rotate(360deg); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .flappy-bird-wrapper {
+    padding: 55px 10px 10px 10px; // Reduced from 70px to 55px
+
+    .game-container {
+      width: 100% !important;
+      height: 80vh !important;
+
+      .message {
+        font-size: 20px;
+        padding: 15px;
+      }
+    }
+  }
+}
+
+@media (hover: hover) {
+  .game-container {
+    &:hover {
+      transform: scale(1.01) translateZ(0);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+// Coin styles
+.coin {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+  border: 2px solid #FF8C00;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); // Brighter glow
+  z-index: 2;
+  transition: opacity 0.2s;
+  animation: coinPulse 2s infinite alternate ease-in-out; // Add pulsing effect
+  
+  &::before {
+    content: '$'; // Show the value instead of $ 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 0 2px #000;
+  }
+  
+  &.collected {
+    animation: collect 0.3s forwards;
+  }
+}
+
+// Add this new animation for coins
+@keyframes coinPulse {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
+  100% { transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 215, 0, 1); }
+}
+
+// Style for coin counter
+.coin-count { 
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFD700;
+  text-shadow: 0 0 3px black;
+  z-index: 10;
+}
+
+// Weather styles
+.game-container {
+  &.sunny { 
+    background: linear-gradient(180deg, #87CEEB 0%, #64b5f6 50%, #1E90FF 100%); 
+    &::before { opacity: 1; } // Sun fully visible
+  }
+  
+  &.rainy { 
+    background: linear-gradient(180deg, #607D8B 0%, #546E7A 50%, #455A64 100%);
+    &::before { opacity: 0.3; filter: blur(5px); } // Sun dimmed
+  }
+  
+  &.snowy { 
+    background: linear-gradient(180deg, #B0BEC5 0%, #90A4AE 50%, #78909C 100%);
+    &::before { opacity: 0.6; filter: blur(3px); } // Sun partially visible
+  }
+  
+  &.foggy { 
+    background: linear-gradient(180deg, #B0BEC5 0%, #CFD8DC 50%, #ECEFF1 100%);
+    &::before { opacity: 0.4; filter: blur(8px); } // Sun very blurry
+  }
+  
+  &.windy { 
+    background: linear-gradient(180deg, #90CAF9 0%, #64B5F6 50%, #42A5F5 100%);
+    &::before { opacity: 0.8; } // More visible particles
+  }
+  
+  &.night { 
+    background: linear-gradient(180deg, #1A237E 0%, #303F9F 50%, #3949AB 100%);
+    &::before {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+      filter: blur(1px);
+      top: 40px;
+      right: 60px;
+      width: 60px;
+      height: 60px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.2);
+    } // Moon instead of sun
+    .cloud { opacity: 0.6; } // Darker clouds
+  }
+}
+
+// Weather particles
+.weather-particle {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  
+  &.rainy {
+    width: 2px;
+    height: 15px;
+    background: rgba(255, 255, 255, 0.7);
+    transform: rotate(15deg);
+    border-radius: 0 0 1px 1px;
+  }
+  
+  &.snowy {
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+  }
+  
+  &.foggy {
+    width: 120px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    filter: blur(8px);
+  }
+  
+  &.windy {
+    width: 30px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.5);
+    transform: rotate(0deg);
+  }
+}
+
+// Weather indicator
+.weather-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 16px;
+  color: white;
+  text-shadow: 0 0 3px black;
+  z-index: 10;
+  font-family: 'Arial', sans-serif;
+  text-transform: capitalize;
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+}
+
+// Add the feather styling
+.feather {
+  position: absolute;
+  border-radius: 50% 50% 0 50%;
+  box-shadow: 0 0 3px rgba(255, 215, 0, 0.3);
+  pointer-events: none;
+  will-change: transform;
+  z-index: 2;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 70%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), transparent);
+    top: 10%;
+    left: 10%;
+    border-radius: 50%;
+  }
+  
+  // Add different animation for each weather type
+  .game-container.rainy & {
+    filter: saturate(0.8) brightness(0.9);
+    animation: featherFallRain 3s forwards;
+  }
+  
+  .game-container.snowy & {
+    filter: brightness(0.95);
+    animation: featherFallSlow 4s forwards;
+  }
+  
+  .game-container.night & {
+    filter: brightness(0.8) saturate(0.8);
+    box-shadow: 0 0 5px rgba(100, 100, 255, 0.3);
+    animation: featherFallGlow 3.5s forwards;
+  }
+  
+  .game-container.foggy & {
+    filter: contrast(0.9) brightness(0.95);
+    animation: featherFallFog 4s forwards;
+  }
+  
+  .game-container.windy & {
+    animation: featherFallWind 2s forwards;
+  }
+  
+  .game-container.sunny & {
+    animation: featherFall 3s forwards;
+  }
+}
+
+@keyframes featherFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translateY(100px) rotate(360deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallRain {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translateY(150px) rotate(270deg) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallSlow {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(40px) translateX(20px) rotate(180deg) scale(0.8);
+  }
+  100% {
+    transform: translateY(120px) translateX(-20px) rotate(360deg) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallFog {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    transform: translateY(100px) rotate(360deg) scale(0.5);
+    filter: blur(2px);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallWind {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(30px) translateX(40px) rotate(180deg) scale(0.7);
+  }
+  100% {
+    transform: translateY(80px) translateX(100px) rotate(360deg) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes featherFallGlow {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    box-shadow: 0 0 5px rgba(100, 100, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(100, 100, 255, 0.5);
+  }
+  100% {
+    transform: translateY(100px) rotate(360deg) scale(0.5);
+    opacity: 0;
+    box-shadow: 0 0 3px rgba(100, 100, 255, 0.2);
+  }
+}
+
+// Add this new animation
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+// Weather-specific pipe styles with more distinct colors
+.pipes {
+  // Base pipe styling reset
+  .pipe {
+    transition: background 0.3s ease, border-color 0.3s ease;
+    
+    &::after {
+      transition: background 0.3s ease;
+    }
+    
+    // Disable the default shine animation first
+    &::before {
+      animation: none !important;
+    }
+  }
+
+  // SUNNY - green pipes
+  &.weather-sunny .pipe {
+    background: linear-gradient(90deg, 
+      #228B22 0%, 
+      #32CD32 50%,
+      #228B22 100%
+    ) !important;
+    border-color: #2E7D32 !important;
+    
+    &::after { 
+      background: #2E7D32 !important; 
+    }
+    
+    // Gentle shine for sunny weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.15) 50%,
+        transparent 100%
+      ) !important;
+      
+    }
+  }
+  
+  // RAINY - blue pipes
+  &.weather-rainy .pipe {
+    background: linear-gradient(90deg, 
+      #0D47A1 0%, 
+      #1976D2 50%,
+      #0D47A1 100%
+    ) !important;
+    border-color: #0D47A1 !important;
+    
+    &::after { 
+      background: #0D47A1 !important; 
+    }
+    
+    // Wet shine for rainy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.2) 50%,
+        transparent 100%
+      ) !important;
+      
+    }
+  }
+  
+  // SNOWY - ice blue pipes
+  &.weather-snowy .pipe {
+    background: linear-gradient(90deg, 
+      #4FC3F7 0%, 
+      #81D4FA 50%,
+      #4FC3F7 100%
+    ) !important;
+    border-color: #29B6F6 !important;
+    
+    &::after { 
+      background: #29B6F6 !important; 
+    }
+    
+    // Frosty shine for snowy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.25) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+  
+  // FOGGY - gray pipes
+  &.weather-foggy .pipe {
+    background: linear-gradient(90deg, 
+      #757575 0%, 
+      #9E9E9E 50%,
+      #757575 100%
+    ) !important;
+    border-color: #616161 !important;
+    
+    &::after { 
+      background: #616161 !important; 
+    }
+    
+    // Subtle, diffused shine for foggy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.1) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+  
+  // WINDY - tan pipes
+  &.weather-windy .pipe {
+    background: linear-gradient(90deg, 
+      #8D6E63 0%, 
+      #BCAAA4 50%,
+      #8D6E63 100%
+    ) !important;
+    border-color: #795548 !important;
+    
+    &::after { 
+      background: #795548 !important; 
+    }
+    
+    // Quick shine for windy weather
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.12) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+  
+  // NIGHT - dark blue pipes
+  &.weather-night .pipe {
+    background: linear-gradient(90deg, 
+      #1A237E 0%, 
+      #303F9F 50%,
+      #1A237E 100%
+    ) !important;
+    border-color: #0D1752 !important;
+    
+    &::after { 
+      background: #0D1752 !important; 
+    }
+    
+    // Subtle moonlight shine for night
+    &::before {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.08) 50%,
+        transparent 100%
+      ) !important;
+     
+    }
+  }
+}
+
+// Add a gentler shine animation for night
+@keyframes pipeShineNight {
+  0% { transform: translateX(-100%); opacity: 0.3; }
+  50% { opacity: 0.7; }
+  100% { transform: translateX(100%); opacity: 0.3; }
+}
+
+@keyframes weather-transition {
+  0% { backdrop-filter: contrast(1.05) brightness(1.05); }
+  50% { backdrop-filter: contrast(1) brightness(1); }
+  100% { backdrop-filter: none; }
+}
+
+@keyframes sway {
+  0% { transform: translateX(-5px); }
+  100% { transform: translateX(5px); }
+}
+
+@keyframes slight-sway {
+  0% { transform: translateX(-2px); }
+  100% { transform: translateX(2px); }
+}
+
+// Add these bird enhancements to your SCSS file
+
+.bird {
+  transition: transform 0.1s ease-out;
+  
+  // Dynamic expressions
+  &.normal .eye::after {
+    top: 1px;
+    right: 1px;
+    width: 4px;
+    height: 4px;
+  }
+  
+  &.worried {
+    .eye {
+      border-radius: 45% 45% 45% 45%;
+      height: 12px;
+      
+      &::after {
+        width: 3px;
+        height: 3px;
+        top: 2px;
+      }
+    }
+    
+    .beak::after {
+      width: 10px; // longer beak line
+    }
+  }
+  
+  &.happy {
+    .eye {
+      transform: scale(0.8);
+      border-radius: 0 0 50% 50%;
+      height: 8px;
+      
+      &::after {
+        top: 0px;
+        right: 0px;
+      }
+    }
+    
+    .beak::after {
+      transform: scaleY(-1); // inverted mouth line for smile
+      top: 4px;
+    }
+    
+    .cheek {
+      opacity: 1;
+      width: 7px;
+      height: 5px;
+    }
+  }
+  
+  &.surprised {
+    .eye {
+      transform: scale(1.2);
+      border-radius: 50%;
+      
+      &::after {
+        width: 3px;
+        height: 3px;
+      }
+    }
+    
+    .beak {
+      height: 8px;
+      top: 16px;
+      
+      &::after {
+        opacity: 0; // hide mouth line for surprised look
+      }
+    }
+  }
+  
+  // Blinking animation
+  &.blinking .eye::before {
+    animation: quickBlink 0.15s;
+  }
+  
+  // Wing animation states
+  &.wing-0 {
+    &::before {
+      transform: rotate(-5deg) scaleY(0.9);
+    }
+  }
+  
+  &.wing-1 {
+    &::before {
+      transform: rotate(-15deg) scaleY(0.8);
+    }
+  }
+  
+  &.wing-2 {
+    &::before {
+      transform: rotate(-25deg) scaleY(0.7);
+    }
+  }
+  
+  &.wing-3 {
+    &::before {
+      transform: rotate(-15deg) scaleY(0.8);
+    }
+  }
+  
+  // Weather-responsive bird styling
+  &.weather-snowy {
+    &.shivering {
+      animation: shiver 0.1s infinite alternate;
+    }
+    
+    // Add subtle white "frost" to the top of the bird
+    &::after {
+      content: '';
+      position: absolute;
+      width: 70%;
+      height: 8px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.7), transparent);
+      border-radius: 50% 50% 0 0;
+      top: -2px;
+      left: 15%;
+      z-index: 3;
+      pointer-events: none;
+    }
+  }
+  
+  &.weather-rainy {
+    filter: saturate(0.9) brightness(0.9);
+    
+    // Add water drops sliding effect
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, 
+        rgba(255,255,255,0) 20%, 
+        rgba(255,255,255,0.3) 22%, 
+        rgba(255,255,255,0) 30%);
+      border-radius: inherit;
+      animation: rainDropSlide 2s infinite;
+      pointer-events: none;
+    }
+  }
+  
+  &.weather-night {
+    // Add subtle glow around bird in night mode
+    box-shadow: 0 0 8px rgba(173, 216, 230, 0.5), 
+                0 0 12px rgba(100, 149, 237, 0.3);
+    
+    .eye {
+      background: radial-gradient(circle at 30% 30%, #FFCC80, #2C3E50 40%);
+    }
+  }
+  
+  &.weather-windy {
+    &::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 3px;
+      background: rgba(255,255,255,0.6);
+      right: -10px;
+      top: 40%;
+      border-radius: 2px;
+      animation: windLines 0.5s infinite;
+      opacity: 0;
+    }
+  }
+  
+  &.weather-foggy {
+    filter: contrast(0.9);
+    opacity: 0.95;
+  }
+  
+  // Make hat rotate with the bird
+  &.weather-windy .hat {
+    transform: rotate(-5deg); // Slight tilt in windy weather
+  }
+  
+  // When the bird is worried, make the hat shake a bit
+  &.worried .hat {
+    animation: hatWobble 0.5s infinite alternate ease-in-out;
+  }
+}
+
+// New animations for bird expressions and weather effects
+@keyframes quickBlink {
+  0% { top: -100%; }
+  50% { top: 0; }
+  100% { top: -100%; }
+}
+
+@keyframes shiver {
+  0% { transform: translateX(-1px) rotate(var(--rotation, 0deg)); }
+  25% { transform: translateX(0px) rotate(var(--rotation, 0deg)); }
+  50% { transform: translateX(1px) rotate(var(--rotation, 0deg)); }
+  75% { transform: translateX(0px) rotate(var(--rotation, 0deg)); }
+  100% { transform: translateX(-1px) rotate(var(--rotation, 0deg)); }
+}
+
+@keyframes rainDropSlide {
+  0% { 
+    background-position: -40px -40px;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.7;
+  }
+  100% { 
+    background-position: 40px 40px;
+    opacity: 0;
+  }
+}
+
+@keyframes windLines {
+  0% { 
+    right: -10px; 
+    opacity: 0.8;
+    width: 8px;
+  }
+  100% { 
+    right: -25px; 
+    opacity: 0;
+    width: 15px;
+  }
+}
+
+// Add animation for hat wobble
+@keyframes hatWobble {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(3deg); }
+}
+
+// Add these styles for background birds
+
+// Add this for stars in night mode
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: twinkle 3s infinite alternate ease-in-out;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+  
+  &:nth-child(3n) {
+    animation-duration: 4s;
+  }
+  
+  &:nth-child(3n+1) {
+    animation-duration: 2.5s;
+  }
+  
+  &:nth-child(7n) {
+    box-shadow: 0 0 5px rgba(135, 206, 250, 0.9);
+    background: #E6E6FA;
+  }
+  
+  &:nth-child(11n) {
+    box-shadow: 0 0 4px rgba(255, 223, 186, 0.9);
+    background: #FFFAF0;
+  }
+}
+
+// Add this for lightning effect
+.lightning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 10;
+  pointer-events: none;
+  animation: lightningFlash 0.15s;
+}
+
+// Add these animations
+@keyframes twinkle {
+  0%, 100% { 
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes lightningFlash {
+  0% { 
+    opacity: 0;
+  }
+  20% { 
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 0.8;
+  }
+  100% { 
+    opacity: 0;
+  }
+}
+
+// Also add this to enhance the rain effect during lightning
+.game-container.rainy {
+  &.lightning-active {
+    .weather-particle.rainy {
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+  }
+  
+  // Make rain more visible during lightning
+  .lightning + .weather-particle.rainy {
+    opacity: 1;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
+  }
+}
+
+// Add animation for birds flying
+@keyframes birdFloat {
+  0% { transform: translateY(-2px); }
+  50% { transform: translateY(2px); }
+  100% { transform: translateY(-2px); }
+}
+
+// Apply floating animation to all birds
+.bg-bird {
+  animation: birdFloat 2s infinite ease-in-out;
+  
+  // Vary the animation timing
+  &:nth-child(odd) {
+    animation-duration: 2.5s;
+  }
+  
+  &:nth-child(3n) {
+    animation-duration: 1.8s;
+  }
+  
+  &:nth-child(7n) {
+    animation-duration: 3.2s;
+  }
+}
+
+// Screen shake effect
+.screen-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+// Ambient objects
+.ambient-object {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform;
+  
+  &.butterfly {
+    width: 15px;
+    height: 12px;
+    
+    &::before, &::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 12px;
+      background: rgba(255, 165, 0, 0.8);
+      border-radius: 50% 50% 0 50%;
+      transform-origin: center right;
+    }
+    
+    &::before {
+      left: 0;
+      animation: butterflyWing 0.2s infinite alternate ease-in-out;
+    }
+    
+    &::after {
+      right: 0;
+      transform: scaleX(-1);
+      animation: butterflyWing 0.2s infinite alternate-reverse ease-in-out;
+    }
+    
+    // Butterfly body
+    &::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 40% 40% 40% 40%;
+      left: 4.5px;
+      top: 1px;
+    }
+  }
+  
+  &.leaf {
+    width: 12px;
+    height: 15px;
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    border-radius: 40% 0 40% 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      height: 80%;
+      width: 1px;
+      background: rgba(0, 0, 0, 0.3);
+      left: 50%;
+      top: 10%;
+    }
+    
+    // Different colors based on season
+    &:nth-child(2n) {
+      background: linear-gradient(135deg, #8BC34A 0%, #558B2F 100%);
+    }
+    
+    &:nth-child(3n) {
+      background: linear-gradient(135deg, #CDDC39 0%, #AFB42B 100%);
+    }
+  }
+  
+  &.snowflake {
+    width: 10px;
+    height: 10px;
+    background: white;
+    opacity: 0.9;
+    clip-path: polygon(
+      50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+      50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+    );
+    
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      clip-path: inherit;
+      transform: rotate(45deg);
+    }
+  }
+  
+  &.paper {
+    width: 15px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 20%,
+        rgba(0, 0, 0, 0.05) 20%,
+        rgba(0, 0, 0, 0.05) 80%,
+        transparent 80%,
+        transparent
+      );
+      background-size: 10px 2px;
+      background-repeat: repeat-y;
+    }
+  }
+}
+
+@keyframes butterflyWing {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(70deg); }
+}
+
+// Screen shake effect
+.screen-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}

@@ -16,8 +16,8 @@ const PoliticalQuestionnaire: React.FC = () => {
   };
 
   const handleNext = () => {
-    // Here you can save the answers if needed
-    navigate('/hobbies-questionnaire');
+    // Save answers if needed
+    navigate('/questionnaire/hobbies'); // Updated from '/hobbies' to match router config
   };
 
   return (
