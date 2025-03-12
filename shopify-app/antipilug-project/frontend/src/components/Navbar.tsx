@@ -94,7 +94,7 @@ const Navbar: React.FC = () => {
     },
     {
       label: 'Questionnaire',
-      path: '/questionnaires/political',
+      path: '/questionnaire/political', // Changed from '/questionnaires/political'
       icon: <span className="nav-icon">📝</span>,
     },
     
