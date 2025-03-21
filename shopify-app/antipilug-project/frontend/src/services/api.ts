@@ -48,17 +48,15 @@ api.interceptors.response.use(
 
 // Content API
 export const contentApi = {
-  getContent: (params = {}) => api.get('/content', { params }),
-  getContentById: (id) => api.get(`/content/${id}`),
-  getFeaturedContent: () => api.get('/content/featured'),
+  getContent: (page: string) => api.get(`/content/${page}`),
+  updateContent: (page: string, data: any) => api.put(`/content/${page}`, data),
 };
 
 // User API
 export const userApi = {
-  register: (userData) => api.post('/users', userData),
-  login: (credentials) => api.post('/users/login', credentials),
-  getProfile: () => api.get('/users/profile'),
-  updateQuestionnaireChanges: () => api.put('/users/questionnaire-changes'),
+  getProfile: (id: string) => api.get(`/users/${id}`),
+  updateProfile: (id: string, data: any) => api.put(`/users/${id}`, data),
+  createUser: (data: any) => api.post('/users', data),
 };
 
 // Question API
