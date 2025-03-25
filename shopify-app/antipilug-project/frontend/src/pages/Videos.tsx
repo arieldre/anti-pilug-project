@@ -18,7 +18,8 @@ import {
   InputLabel,
   IconButton,
   Tooltip,
-  CircularProgress
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import { 
   Search, 
@@ -29,10 +30,10 @@ import {
 } from '@mui/icons-material';
 import './Videos.scss';
 import { useNavigate } from 'react-router-dom';
+import { videoAPI, contentAPI } from '../services/api';
 
 // Move mockVideos to a separate file to keep component clean
 import { generateMockVideos } from '../utils/mockData.ts';
-import { contentApi, userApi, questionApi } from '../services/api';
 
 const VIDEOS_PER_PAGE = 12;
 
@@ -46,6 +47,7 @@ const Videos: React.FC = () => {
   });
 
   const [videos, setVideos] = useState<any[]>([]);
+  const [content, setContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -120,43 +122,27 @@ const Videos: React.FC = () => {
     navigate(`/video/${videoId}`);
   };
 
-  useEffect(() => {
-    const fetchVideos = async () => {
+  const fetchData = async () => {
+    try {
       setLoading(true);
-      try {
-        // Build query parameters from filters
-        const params = new URLSearchParams();
-        if (selectedFilters.subject) params.append('subject', selectedFilters.subject);
-        if (selectedFilters.politicalSide) params.append('politicalSide', selectedFilters.politicalSide);
-        if (selectedFilters.country) params.append('country', selectedFilters.country);
-        if (selectedFilters.sortBy) params.append('sortBy', selectedFilters.sortBy);
-        
-        const response = await axios.get(`/api/videos?${params.toString()}`);
-        setVideos(response.data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching videos:', err);
-        setError('Failed to load videos. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVideos();
-  }, [selectedFilters]);
+      setError(null);
+      const [videosData, contentData] = await Promise.all([
+        videoAPI.getVideos(selectedFilters.sortBy),
+        contentAPI.getContent('videos')
+      ]);
+      setVideos(videosData);
+      setContent(contentData);
+    } catch (err) {
+      setError('Failed to load content. Please try again later.');
+      console.error('Error fetching content:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await contentApi.getContent();
-        setContent(response.data);
-      } catch (error) {
-        console.error('Error fetching content:', error);
-      }
-    };
-    
     fetchData();
-  }, []);
+  }, [selectedFilters.sortBy]);
 
   if (loading) {
     return (
@@ -168,6 +154,14 @@ const Videos: React.FC = () => {
         bgcolor="#fff"
       >
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{error}</Alert>
       </Box>
     );
   }

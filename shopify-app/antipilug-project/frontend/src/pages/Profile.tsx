@@ -12,17 +12,45 @@ import {
   ListItemAvatar,
   ListItemText,
   Tooltip,
+  CircularProgress,
+  Alert,
+  Paper,
 } from '@mui/material';
 import { MonetizationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import './Profile.scss';
-import { contentApi, userApi, questionApi } from '../services/api';
+import { userAPI, contentAPI } from '../services/api';
+
+interface UserProfile {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  city: string;
+  birthDate: string;
+  education: string;
+  militaryService: string | null;
+  coins: number;
+  level: number;
+  points: number;
+  xpToNextLevel: number;
+  callsMade: number;
+  likesReceived: number;
+  lastCalls: Array<{
+    date: string;
+    duration: string;
+    liked: boolean;
+  }>;
+  dailyStreak: number;
+  bio: string;
+  questionnaireChangesLeft: number;
+}
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   
-  const [userProfile, setUserProfile] = useState(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [answers, setAnswers] = useState({});
@@ -30,67 +58,36 @@ const Profile: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [content, setContent] = useState(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
+  const fetchUserProfile = async () => {
+    try {
       setLoading(true);
-      try {
-        // Get user ID from auth context or local storage
-        const userId = localStorage.getItem('userId'); // or context
-        
-        if (!userId) {
-          throw new Error('User not authenticated');
-        }
-        
-        const response = await axios.get(`/api/users/${userId}`);
-        setUserProfile(response.data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching user profile:', err);
+      setError(null);
+      const userData = await userAPI.getProfile();
+      setUserProfile(userData);
+      
+      // Fetch user's content
+      const contentData = await contentAPI.getContent('profile');
+      setContent(contentData);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'User not authenticated') {
+        navigate('/login');
+      } else {
         setError('Failed to load profile. Please try again later.');
-      } finally {
-        setLoading(false);
+        console.error('Error fetching user profile:', err);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUserProfile();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await contentApi.getContent();
-        setContent(response.data);
-      } catch (error) {
-        console.error('Error fetching content:', error);
-      }
-    };
-    
-    fetchData();
-  }, []);
-
-  // Move user data definition before using it
-  const user = {
-    name: 'John Doe',
-    coins: 120,
-    level: 5,
-    points: 350,
-    xpToNextLevel: 500,
-    callsMade: 30,
-    likesReceived: 150,
-    lastCalls: [
-      { date: '2023-10-01', duration: '15 mins', liked: true },
-      { date: '2023-09-30', duration: '20 mins', liked: false },
-      { date: '2023-09-29', duration: '10 mins', liked: true },
-    ],
-    dailyStreak: 7,
-    bio: 'Passionate about bridging political divides.',
-    age: 28,
-    picture: 'https://via.placeholder.com/150',
-    questionnaireChangesLeft: 3,
-  };
-
-  // Initialize state after user object is defined
-  const [remainingChanges, setRemainingChanges] = useState(user.questionnaireChangesLeft);
+  // Initialize state after userProfile is loaded
+  const [remainingChanges, setRemainingChanges] = useState(
+    userProfile?.questionnaireChangesLeft || 0
+  );
 
   const friends = [
     { name: 'Alice', level: 3, online: true, picture: 'https://via.placeholder.com/50' },
@@ -110,7 +107,7 @@ const Profile: React.FC = () => {
   ];
 
   const handleLevelClick = () => {
-    navigate('/build-city', { state: { level: user.level, points: user.points } });
+    navigate('/build-city', { state: { level: userProfile?.level, points: userProfile?.points } });
   };
 
   const handleStatisticsClick = () => {
@@ -118,7 +115,7 @@ const Profile: React.FC = () => {
   };
 
   const handleQuestionnaireClick = () => {
-    if (user.level >= 3 && remainingChanges > 0) {
+    if (userProfile?.level >= 3 && remainingChanges > 0) {
       console.log('Previous remaining changes:', remainingChanges);
       setRemainingChanges(prev => prev - 1);
       console.log('New remaining changes:', remainingChanges - 1);
@@ -160,24 +157,48 @@ const Profile: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">No user data available</Alert>
+      </Box>
+    );
+  }
+
   return (
     <div className="profile">
       {/* Profile Header */}
       <header className="profile-header">
-        <Avatar alt={user.name} src={user.picture} className="profile-picture" />
+        <Avatar alt={userProfile.name} src={userProfile.profileImage} className="profile-picture" />
         <Box className="profile-info">
           <Typography variant="h4" className="profile-name">
-            {user.name}
+            {userProfile.name}
           </Typography>
           <Typography variant="body1" className="profile-bio">
-            {user.bio}
+            {userProfile.bio}
           </Typography>
           <Typography variant="body2" className="profile-age">
-            Age: {user.age}
+            Age: {calculateAge(userProfile.birthDate)}
           </Typography>
           <Box className="profile-coins">
             <MonetizationOn className="coins-icon" />
-            <Typography variant="body1">{user.coins}</Typography>
+            <Typography variant="body1">{userProfile.coins}</Typography>
           </Box>
         </Box>
       </header>
@@ -189,14 +210,14 @@ const Profile: React.FC = () => {
           <Card className="profile-card level-card" onClick={handleLevelClick}>
             <CardContent>
               <Typography variant="h6">Level</Typography>
-              <Typography variant="body1">Level {user.level}</Typography>
+              <Typography variant="body1">Level {userProfile.level}</Typography>
               <LinearProgress
                 variant="determinate"
-                value={(user.points / user.xpToNextLevel) * 100}
+                value={(userProfile.points / userProfile.xpToNextLevel) * 100}
                 className="level-progress"
               />
               <Typography variant="body2">
-                {user.points} / {user.xpToNextLevel} Points
+                {userProfile.points} / {userProfile.xpToNextLevel} Points
               </Typography>
             </CardContent>
           </Card>
@@ -204,16 +225,16 @@ const Profile: React.FC = () => {
           <Card className="profile-card statistics-card" onClick={handleStatisticsClick}>
             <CardContent>
               <Typography variant="h6">Statistics</Typography>
-              <Typography variant="body1">Calls Made: {user.callsMade}</Typography>
-              <Typography variant="body1">Likes Received: {user.likesReceived}</Typography>
-              <Typography variant="body1">Daily Streak: {user.dailyStreak} days</Typography>
+              <Typography variant="body1">Calls Made: {userProfile.callsMade}</Typography>
+              <Typography variant="body1">Likes Received: {userProfile.likesReceived}</Typography>
+              <Typography variant="body1">Daily Streak: {userProfile.dailyStreak} days</Typography>
             </CardContent>
           </Card>
 
           <Card className="profile-card call-history-card">
             <CardContent>
               <Typography variant="h6">Call History</Typography>
-              {user.lastCalls.map((call, index) => (
+              {userProfile.lastCalls.map((call, index) => (
                 <Typography key={index} variant="body2">
                   {call.date} - {call.duration} - {call.liked ? 'Liked' : 'Not Liked'}
                 </Typography>
@@ -222,7 +243,7 @@ const Profile: React.FC = () => {
           </Card>
 
           {/* Conditionally render Questionnaire Card */}
-          {user.level >= 3 ? (
+          {userProfile.level >= 3 ? (
             <Tooltip title={`${remainingChanges} changes remaining`} arrow placement="top">
               <Card 
                 className={`profile-card questionnaire-card ${remainingChanges === 0 ? 'questionnaire-card-locked' : ''}`}
@@ -277,8 +298,31 @@ const Profile: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {content && (
+        <Paper sx={{ p: 3, mt: 3 }}>
+          <Typography variant="h5" gutterBottom>
+            Your Content
+          </Typography>
+          <Typography variant="body1">
+            {content?.description}
+          </Typography>
+        </Paper>
+      )}
     </div>
   );
+};
+
+// Helper function to calculate age
+const calculateAge = (birthDate: string): number => {
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
 };
 
 export default Profile;

@@ -1,49 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Container, Paper } from '@mui/material';
-import { contentApi } from '../services/api';
-
-interface ContentData {
-  title: string;
-  description: string;
-  content: any;
-}
+import React, { useEffect, useState } from 'react';
+import { contentAPI } from '../services/api';
+import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 
 const Home: React.FC = () => {
-  const [content, setContent] = useState<ContentData>({
-    title: '',
-    description: '',
-    content: {},
-  });
+  const [content, setContent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadContent();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await contentAPI.getContent('home');
+        setContent(data);
+      } catch (err) {
+        setError('Failed to load content. Please try again later.');
+        console.error('Error fetching content:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const loadContent = async () => {
-    try {
-      const response = await contentApi.getContent('home');
-      setContent(response.data);
-    } catch (error) {
-      console.error('Error loading content:', error);
-    }
-  };
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ py: 4 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          {content.title}
-        </Typography>
-        <Typography variant="h5" color="text.secondary" paragraph>
-          {content.description}
-        </Typography>
-        <Paper sx={{ p: 3, mt: 4 }}>
-          <Typography variant="body1">
-            {typeof content.content === 'string' ? content.content : JSON.stringify(content.content)}
-          </Typography>
-        </Paper>
-      </Box>
-    </Container>
+    <Box p={3}>
+      <Typography variant="h4" gutterBottom>
+        Welcome to Anti-Pilug
+      </Typography>
+      {content && (
+        <Box>
+          {/* Render your content here */}
+          <Typography variant="body1">{content.description}</Typography>
+        </Box>
+      )}
+    </Box>
   );
 };
 

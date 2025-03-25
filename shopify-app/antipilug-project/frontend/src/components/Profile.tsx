@@ -1,94 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Button, Avatar } from '@mui/material';
-import { userApi } from '../services/api';
-
-interface ProfileData {
-  name: string;
-  bio: string;
-  profileImage: string;
-}
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, CircularProgress, Alert, Avatar, Paper } from '@mui/material';
+import { userAPI, contentAPI } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
-  const [profile, setProfile] = useState<ProfileData>({
-    name: '',
-    bio: '',
-    profileImage: '',
-  });
-  const [isEditing, setIsEditing] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [content, setContent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const userData = await userAPI.getProfile();
+      setUser(userData);
+      
+      // Fetch user's content
+      const contentData = await contentAPI.getContent('profile');
+      setContent(contentData);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'User not authenticated') {
+        navigate('/login');
+      } else {
+        setError('Failed to load profile. Please try again later.');
+        console.error('Error fetching user profile:', err);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // In a real app, you would get the user ID from authentication
-    const userId = '1'; // Placeholder
-    loadProfile(userId);
+    fetchUserProfile();
   }, []);
 
-  const loadProfile = async (userId: string) => {
-    try {
-      const response = await userApi.getProfile(userId);
-      setProfile(response.data);
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    }
-  };
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-  const handleSave = async () => {
-    try {
-      const userId = '1'; // Placeholder
-      await userApi.updateProfile(userId, profile);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error saving profile:', error);
-    }
-  };
+  if (error) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Avatar
-          src={profile.profileImage}
-          sx={{ width: 100, height: 100, mr: 2 }}
-        />
-        <Typography variant="h4">{profile.name}</Typography>
-      </Box>
+    <Box p={3}>
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Box display="flex" alignItems="center" mb={2}>
+          <Avatar
+            src={user?.avatar || 'https://via.placeholder.com/150'}
+            alt={user?.name}
+            sx={{ width: 100, height: 100, mr: 2 }}
+          />
+          <Box>
+            <Typography variant="h4">{user?.name}</Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              {user?.email}
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
 
-      {isEditing ? (
-        <>
-          <TextField
-            fullWidth
-            label="Name"
-            value={profile.name}
-            onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Bio"
-            multiline
-            rows={4}
-            value={profile.bio}
-            onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Profile Image URL"
-            value={profile.profileImage}
-            onChange={(e) => setProfile({ ...profile, profileImage: e.target.value })}
-            sx={{ mb: 2 }}
-          />
-          <Button variant="contained" onClick={handleSave}>
-            Save
-          </Button>
-        </>
-      ) : (
-        <>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            {profile.bio}
+      {content && (
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h5" gutterBottom>
+            Your Content
           </Typography>
-          <Button variant="outlined" onClick={() => setIsEditing(true)}>
-            Edit Profile
-          </Button>
-        </>
+          <Typography variant="body1">
+            {content.description}
+          </Typography>
+        </Paper>
       )}
     </Box>
   );

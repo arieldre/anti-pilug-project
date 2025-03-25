@@ -13,13 +13,14 @@ import {
   IconButton,
   CircularProgress,
   Tabs,
-  Tab
+  Tab,
+  Alert
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ShareIcon from '@mui/icons-material/Share';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import './styles/Home.scss';
-import { contentApi, userApi, questionApi } from '../services/api';
+import { contentAPI, userApi, questionApi } from '../services/api';
 
 interface ContentItem {
   id: number;
@@ -42,13 +43,18 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await contentApi.getContent();
-        setContent(response.data);
-      } catch (error) {
-        console.error('Error fetching content:', error);
+        setLoading(true);
+        setError(null);
+        const data = await contentAPI.getContent('home');
+        setContent(data);
+      } catch (err) {
+        setError('Failed to load content. Please try again later.');
+        console.error('Error fetching content:', err);
+      } finally {
+        setLoading(false);
       }
     };
-    
+
     fetchData();
   }, []);
 
@@ -64,6 +70,22 @@ const Home: React.FC = () => {
   const filteredContent = activeTab === 'all' 
     ? content 
     : content.filter(item => item.type === activeTab);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <div className="home-page">
@@ -106,65 +128,55 @@ const Home: React.FC = () => {
           </Tabs>
         </Box>
 
-        {loading ? (
-          <Box display="flex" justifyContent="center" p={4}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Box display="flex" justifyContent="center" p={4}>
-            <Typography color="error">{error}</Typography>
-          </Box>
-        ) : (
-          <Grid container spacing={3}>
-            {filteredContent.map((item) => (
-              <Grid item xs={12} sm={6} md={4} key={item.id}>
-                <Card 
-                  className="content-card"
-                  onClick={() => navigate(item.link)}
-                >
-                  <CardMedia
-                    component="img"
-                    height="225"
-                    image={item.imageUrl}
-                    alt={item.title}
-                  />
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {item.title}
+        <Grid container spacing={3}>
+          {filteredContent.map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item.id}>
+              <Card 
+                className="content-card"
+                onClick={() => navigate(item.link)}
+              >
+                <CardMedia
+                  component="img"
+                  height="225"
+                  image={item.imageUrl}
+                  alt={item.title}
+                />
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {item.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    {item.description}
+                  </Typography>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(item.date).toLocaleDateString()}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      {item.description}
-                    </Typography>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Typography variant="caption" color="text.secondary">
-                        {new Date(item.date).toLocaleDateString()}
-                      </Typography>
-                      <IconButton 
-                        size="small" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleShare(item);
-                        }}
-                      >
-                        <ShareIcon />
-                      </IconButton>
-                    </Box>
-                    <Box mt={1}>
-                      {item.tags.map((tag) => (
-                        <Chip
-                          key={tag}
-                          label={tag}
-                          size="small"
-                          sx={{ mr: 0.5, mb: 0.5 }}
-                        />
-                      ))}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
+                    <IconButton 
+                      size="small" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShare(item);
+                      }}
+                    >
+                      <ShareIcon />
+                    </IconButton>
+                  </Box>
+                  <Box mt={1}>
+                    {item.tags.map((tag) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        size="small"
+                        sx={{ mr: 0.5, mb: 0.5 }}
+                      />
+                    ))}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Container>
     </div>
   );

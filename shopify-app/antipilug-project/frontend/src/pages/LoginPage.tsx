@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff, Google as GoogleIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../services/api';
 import './styles/LoginPage.scss';
 
 interface LoginFormData {
@@ -58,10 +59,8 @@ const LoginPage: React.FC = () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        // TODO: Implement actual login logic here
-        navigate('/');
+        await authAPI.login(formData.email, formData.password);
+        navigate('/profile');
       } catch (error) {
         console.error('Login failed:', error);
         setErrors({
