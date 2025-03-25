@@ -20,6 +20,7 @@ import { Visibility, VisibilityOff, Google as GoogleIcon } from '@mui/icons-mate
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import './styles/SignUpPage.scss';
 import { getBackgroundStyle } from '../utils/backgroundUtils';
+import { authAPI } from '../services/api';
 
 // Initialize Google OAuth - add this before component
 const loadGoogleScript = () => {
@@ -136,6 +137,7 @@ const SignUpPage: React.FC = () => {
     hasNumber: false,
     hasSpecial: false,
   });
+  const [error, setError] = useState<string | null>(null);
 
   const checkPasswordStrength = (password: string): 'weak' | 'medium' | 'strong' | null => {
     const criteria = {
@@ -196,7 +198,7 @@ const SignUpPage: React.FC = () => {
         parseInt(formData.birthDay)
       );
       const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
+      let age = today.getFullYear() - birthDate.getFullYear();
       const m = today.getMonth() - birthDate.getMonth();
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
@@ -215,10 +217,22 @@ const SignUpPage: React.FC = () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        navigate('/questionnaire'); // Navigate to questionnaire after signup
-      } catch (error) {
-        console.error('Signup error:', error);
+        const userData = {
+          email: formData.email,
+          password: formData.password,
+          name: `${formData.firstName} ${formData.lastName}`,
+          phoneNumber: formData.phoneNumber,
+          city: formData.city,
+          birthDate: `${formData.birthYear}-${formData.birthMonth}-${formData.birthDay}`,
+          education: formData.education === 'Other' ? formData.educationCustom : formData.education,
+          militaryService: formData.militaryService === 'None' ? null : formData.militaryService
+        };
+        
+        const response = await authAPI.register(userData);
+        navigate('/profile');
+      } catch (err) {
+        console.error('Error signing up:', err);
+        setError('Failed to create account. Please try again.');
       } finally {
         setLoading(false);
       }

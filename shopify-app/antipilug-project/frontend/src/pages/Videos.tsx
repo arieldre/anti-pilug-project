@@ -1,5 +1,7 @@
 // filepath: /c:/Users/arara/OneDrive/שולחן העבודה/projectantipilug/shopify-app/shopify-app/antipilug-project/src/pages/Videos.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Grid, 
   Card, 
@@ -16,7 +18,8 @@ import {
   InputLabel,
   IconButton,
   Tooltip,
-  CircularProgress
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import { 
   Search, 
@@ -27,6 +30,7 @@ import {
 } from '@mui/icons-material';
 import './Videos.scss';
 import { useNavigate } from 'react-router-dom';
+import { videoAPI, contentAPI } from '../services/api';
 
 // Move mockVideos to a separate file to keep component clean
 import { generateMockVideos } from '../utils/mockData.ts';
@@ -34,17 +38,20 @@ import { generateMockVideos } from '../utils/mockData.ts';
 const VIDEOS_PER_PAGE = 12;
 
 const Videos: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [selectedFilters, setSelectedFilters] = useState({
-    subject: '',
-    politicalSide: '',
-    country: '',
-    sortBy: 'recent'
+    subject: searchParams.get('subject') || '',
+    politicalSide: searchParams.get('perspective') || '',
+    country: searchParams.get('country') || '',
+    sortBy: searchParams.get('sortBy') || 'newest'
   });
 
   const [videos, setVideos] = useState<any[]>([]);
+  const [content, setContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -115,6 +122,28 @@ const Videos: React.FC = () => {
     navigate(`/video/${videoId}`);
   };
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [videosData, contentData] = await Promise.all([
+        videoAPI.getVideos(selectedFilters.sortBy),
+        contentAPI.getContent('videos')
+      ]);
+      setVideos(videosData);
+      setContent(contentData);
+    } catch (err) {
+      setError('Failed to load content. Please try again later.');
+      console.error('Error fetching content:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [selectedFilters.sortBy]);
+
   if (loading) {
     return (
       <Box 
@@ -125,6 +154,14 @@ const Videos: React.FC = () => {
         bgcolor="#fff"
       >
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{error}</Alert>
       </Box>
     );
   }
