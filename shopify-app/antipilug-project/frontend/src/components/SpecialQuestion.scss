@@ -92,7 +92,6 @@
       gap: 0.8rem;
       justify-content: center;
       align-items: center;
-      transition: all 0.2s ease;
       
       &.left-zone {
         background: rgba(76, 175, 80, 0.1);
@@ -106,9 +105,8 @@
       
       // Highlight drop zone when element is being dragged over
       &.dragover {
-        background-color: rgba(255, 255, 255, 0.2);
-        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
+        background-color: rgba(255, 235, 59, 0.2);
+        border: 2px dashed #ffc107;
       }
     }
 
@@ -120,7 +118,7 @@
       position: relative;
       overflow: hidden;
       box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      transition: transform 0.2s, box-shadow 0.2s, all 0.2s ease;
+      transition: transform 0.2s, box-shadow 0.2s;
       
       &.left {
         background: linear-gradient(145deg, #5cb85c, #4caf50);
@@ -131,16 +129,14 @@
       }
       
       &.dragging {
-        opacity: 0.5;
-        cursor: grabbing;
-        border: 2px dashed #666 !important;
-        transform: scale(1.05);
-        z-index: 100;
+        opacity: 0.4;
+        transform: scale(0.9);
+        box-shadow: 0 2px 3px rgba(0,0,0,0.1);
       }
       
       &:hover {
-        transform: scale(1.05);
-        z-index: 10;
+        transform: translateY(-5px);
+        box-shadow: 0 6px 10px rgba(0,0,0,0.3);
       }
       
       .stone-texture {
@@ -309,95 +305,6 @@
       color: #2c3e50;
       text-align: center;
     }
-
-    .dartboard-container {
-      position: relative;
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      padding-left: 100px; /* Add padding to make room for the bow */
-      box-sizing: border-box;
-    }
-
-    .bow-container {
-      position: absolute;
-      left: -70px !important; /* Move further left - was -20px */
-      top: 60% !important; /* Move down from 50% */
-      transform: translateY(-50%) scaleX(-1);
-      z-index: 2;
-      
-      svg {
-        overflow: visible;
-      }
-    }
-    
-    .flying-arrow-container {
-      position: absolute;
-      left: -5px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 100%;
-      height: 20px;
-      z-index: 1;
-      pointer-events: none;
-      
-      .flying-arrow {
-        position: absolute;
-        left: 15px; /* Start position */
-        width: 40px;
-        transform: scaleX(1.5);
-        animation: shootArrow 0.5s forwards;
-      }
-    }
-
-    .controls {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      margin: 20px 0;
-      
-      .throw-button {
-        background-color: #FF9800;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        
-        &:hover:not(:disabled) {
-          background-color: #F57C00;
-        }
-        
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-      
-      .reset-button {
-        background-color: #eee;
-        color: #333;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        
-        &:hover:not(:disabled) {
-          background-color: #ddd;
-        }
-        
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-    }
   }
 }
 
@@ -406,100 +313,18 @@
 }
 
 .bowstring.animating {
+  d: path('M5,-80 L15,0 L5,80');
   animation: releaseString 0.6s forwards;
 }
 
 @keyframes releaseString {
-  0% { d: path('M 15,-60 Q 25,0 15,60'); }
-  100% { d: path('M 15,-60 L 15,60'); }
-}
-
-@keyframes drawBow {
-  0% { d: path('M 15,-60 Q -20,0 15,60'); }
-  50% { d: path('M 15,-60 Q -10,0 15,60'); }
-  100% { d: path('M 15,-60 Q -20,0 15,60'); }
+  0% { d: path('M5,-80 L15,0 L5,80'); }
+  15% { d: path('M5,-80 L10,0 L5,80'); }
+  100% { d: path('M5,-80 L-12,0 L5,80'); }
 }
 
 @keyframes pulse {
   0% { opacity: 0.4; }
   50% { opacity: 1; }
   100% { opacity: 0.4; }
-}
-
-// Add these styles to improve stone dragging
-
-.stone {
-  cursor: grab;
-  
-  &.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-    border: 2px dashed #666;
-  }
-}
-
-.stone-drop-zone {
-  min-height: 50px; // Ensure there's always a drop area
-  
-  &.dragover {
-    background-color: rgba(0, 0, 0, 0.05);
-    border: 2px dashed #aaa;
-  }
-}
-
-// Add these styles for improved drag and drop feedback
-
-.stone {
-  position: relative;
-  cursor: grab;
-  transition: all 0.2s ease;
-  
-  &.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-    border: 2px dashed #666 !important;
-    transform: scale(1.05);
-    z-index: 100;
-  }
-  
-  &:hover {
-    transform: scale(1.05);
-    z-index: 10;
-  }
-}
-
-.stone-drop-zone {
-  min-height: 50px;
-  transition: all 0.2s ease;
-  
-  &.dragover {
-    background-color: rgba(255, 255, 255, 0.2);
-    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-  }
-}
-
-@keyframes flyIn {
-  0% {
-    transform: translate(0, -150px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-
-// Update the shootArrow animation to use CSS variables for dynamic positioning
-@keyframes shootArrow {
-  0% {
-    left: 15px;
-    opacity: 1;
-  }
-  90% {
-    left: 240px;
-    opacity: 1;
-  }
-  100% {
-    left: 240px;
-    opacity: 0;
-  }
 }
