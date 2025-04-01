@@ -211,41 +211,60 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
         </div>
         
         <div className="target-container">
-          <svg width="420" height="320">
-            {/* Target - Centered in the container */}
-            <g transform="translate(210, 160)">
-              {/* Outer ring - light grey, not pure white */}
+          <svg width="480" height="320">
+            <defs>
+              <linearGradient id="bowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="20%" stopColor="#5d4037" />
+                <stop offset="80%" stopColor="#8d6e63" />
+              </linearGradient>
+              
+              {/* Add this new gradient for the background */}
+              <radialGradient id="bgGradient" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
+                <stop offset="0%" stopColor="#444444" />
+                <stop offset="80%" stopColor="#333333" />
+                <stop offset="100%" stopColor="#222222" />
+              </radialGradient>
+            </defs>
+            
+            {/* Replace the rectangle with this */}
+            <rect x="80" y="0" width="400" height="320" rx="8" fill="url(#bgGradient)" />
+            <rect x="80" y="0" width="400" height="320" rx="8" fill="url(#bgGradient)" 
+                  stroke="#555" strokeWidth="2" />
+            
+            {/* Target - Centered in the grey area */}
+            <g transform="translate(280, 160)">
+              {/* Outer ring - medium grey (darkened from light grey) */}
               <circle cx="0" cy="0" r="120" fill="#212121" />
-              <circle cx="0" cy="0" r="118" fill="#e0e0e0" />
+              <circle cx="0" cy="0" r="118" fill="#9e9e9e" />
               
-              {/* Second ring - slightly darker grey */}
+              {/* Second ring - darker grey */}
               <circle cx="0" cy="0" r="95" fill="#212121" />
-              <circle cx="0" cy="0" r="93" fill="#c0c0c0" />
+              <circle cx="0" cy="0" r="93" fill="#757575" />
               
-              {/* Third ring - medium grey */}
+              {/* Third ring - very dark grey */}
               <circle cx="0" cy="0" r="70" fill="#212121" />
-              <circle cx="0" cy="0" r="68" fill="#9e9e9e" />
+              <circle cx="0" cy="0" r="68" fill="#616161" />
               
-              {/* Fourth ring - darker grey */}
+              {/* Fourth ring - extremely dark grey */}
               <circle cx="0" cy="0" r="45" fill="#212121" />
-              <circle cx="0" cy="0" r="43" fill="#757575" />
+              <circle cx="0" cy="0" r="43" fill="#424242" />
               
-              {/* Fifth ring - very dark grey */}
+              {/* Fifth ring - nearly black */}
               <circle cx="0" cy="0" r="20" fill="#212121" />
-              <circle cx="0" cy="0" r="18" fill="#424242" />
+              <circle cx="0" cy="0" r="18" fill="#323232" />
               
-              {/* Accent ring - orange for some color */}
+              {/* Accent ring - darker orange for maturity */}
               <circle cx="0" cy="0" r="12" fill="#212121" />
-              <circle cx="0" cy="0" r="10" fill="#ff9800" />
+              <circle cx="0" cy="0" r="10" fill="#e65100" />
               
               {/* Bullseye - black with small white center */}
               <circle cx="0" cy="0" r="5" fill="#000000" />
               <circle cx="0" cy="0" r="2" fill="#ffffff" />
             </g>
 
-            {/* Bow on the left - same design but bigger */}
+            {/* Bow on the left - OUTSIDE the rectangle */}
             <g className="bow" transform="translate(30, 160)">
-              {/* Bow limbs with gradient for more dimension */}
+              {/* Bow gradient definition */}
               <defs>
                 <linearGradient id="bowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="20%" stopColor="#5d4037" />
@@ -293,7 +312,7 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
             {arrows.map((arrow, index) => (
               <PixelArrow 
                 key={index} 
-                x={210 + arrow.x - 40}  // Adjusted to match actual landing positions
+                x={280 + arrow.x - 40}  // Adjusted to match new target center (280)
                 y={160 + arrow.y - 8}
               />
             ))}
@@ -335,7 +354,7 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
                   opacity: 1;
                 }
                 100% {
-                  transform: translate(${currentArrow ? (210 + currentArrow.targetX - 80) : 0}px, 
+                  transform: translate(${currentArrow ? (280 + currentArrow.targetX - 80) : 0}px, 
                                     ${currentArrow ? (currentArrow.targetY) : 0}px);
                   opacity: 1;
                 }
