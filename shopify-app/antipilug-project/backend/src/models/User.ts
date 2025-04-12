@@ -1,5 +1,28 @@
 import mongoose from 'mongoose';
 
+interface IUser {
+  email: string;
+  password?: string;  // Make password optional
+  name: string;
+  phoneNumber: string;
+  city: string;
+  birthDate: Date;
+  education: string;
+  militaryService: string | null;
+  profileImage: string | undefined;
+  bio: string;
+  coins: number;
+  level: number;
+  points: number;
+  xpToNextLevel: number;
+  callsMade: number;
+  likesReceived: number;
+  lastCalls: { date: Date; duration: string; liked: boolean }[];
+  dailyStreak: number;
+  questionnaireChangesLeft: number;
+  createdAt: Date;
+}
+
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -84,4 +107,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('User', userSchema); 
+const User = mongoose.model<IUser>('User', userSchema);
+
+export default User; 
