@@ -1,5 +1,29 @@
 import mongoose from 'mongoose';
 
+interface IContent {
+  page: 'home' | 'profile' | 'about' | 'contact';
+  title: string;
+  description?: string;
+  content: any;
+  updatedAt: Date;
+}
+
+export interface IRecommendedContent {
+  type: 'video' | 'research' | 'news';
+  title: string;
+  description: string;
+  imageUrl: string;
+  link: string;
+  date: Date;
+  tags: string[];
+  education: string;
+  militaryService: string;
+  city: string;
+  level: number;
+  politicalAlignment: number;
+  createdAt: Date;
+}
+
 const contentSchema = new mongoose.Schema({
   page: {
     type: String,
@@ -48,40 +72,19 @@ const recommendedContentSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    default: Date.now,
-  },
-  tags: [{
-    type: String,
-  }],
-  education: {
-    type: String,
     required: true,
   },
-  militaryService: {
-    type: String,
-    required: true,
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  level: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 10,
-  },
-  politicalAlignment: {
-    type: Number,
-    required: true,
-    min: -10,
-    max: 10,
-  },
+  tags: [String],
+  education: String,
+  militaryService: String,
+  city: String,
+  level: Number,
+  politicalAlignment: Number,
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-export const RecommendedContent = mongoose.model('RecommendedContent', recommendedContentSchema);
-export default mongoose.model('Content', contentSchema); 
+export const Content = mongoose.model<IContent>('Content', contentSchema);
+export const RecommendedContent = mongoose.model<IRecommendedContent>('RecommendedContent', recommendedContentSchema); 

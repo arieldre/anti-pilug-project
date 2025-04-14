@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import Content from '../models/Content';
-import { RecommendedContent } from '../models/Content';
+import { Content, RecommendedContent, IRecommendedContent } from '../models/Content';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
 
@@ -83,42 +82,17 @@ export const getRecommendedContent = async (req: Request, res: Response) => {
       .limit(20);
 
     // Add thumbnails to content
-    recommendedContent = recommendedContent.map(content => {
+    const contentWithThumbnails = recommendedContent.map(content => {
       const contentObj = content.toObject();
-      contentObj.imageUrl = getThumbnailUrl(contentObj.link);
-      return contentObj;
+      return {
+        ...contentObj,
+        imageUrl: getThumbnailUrl(contentObj.link)
+      };
     });
 
-    // Add mock "coming soon" talks
-    const talks = [
-      {
-        id: 'talk-1',
-        type: 'talk',
-        title: 'Coming Soon: Political Discourse Workshop',
-        description: 'Join us for an interactive workshop on constructive political dialogue.',
-        imageUrl: 'https://via.placeholder.com/300x200',
-        link: '#',
-        date: new Date(),
-        tags: ['Workshop', 'Coming Soon']
-      },
-      {
-        id: 'talk-2',
-        type: 'talk',
-        title: 'Coming Soon: Community Discussion Panel',
-        description: 'A panel discussion featuring diverse perspectives on current political topics.',
-        imageUrl: 'https://via.placeholder.com/300x200',
-        link: '#',
-        date: new Date(),
-        tags: ['Panel', 'Coming Soon']
-      }
-    ];
-
-    // Combine recommended content with talks
-    const allContent = [...recommendedContent, ...talks];
-
-    res.json(allContent);
+    res.json(contentWithThumbnails);
   } catch (error) {
-    console.error('Error fetching recommended content:', error);
+    console.error('Error getting recommended content:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
