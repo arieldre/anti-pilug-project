@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: antipilug-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: antipilug-frontend
+  template:
+    metadata:
+      labels:
+        app: antipilug-frontend
+    spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
+      containers:
+      - name: antipilug-frontend
+        image: liorshem/antipilug-frontend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: REACT_APP_API_URL
+          value: "http://antipilug-backend:5000"
+        - name: HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "3000"
+        - name: NODE_ENV
+          value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: antipilug-frontend
+spec:
+  selector:
+    app: antipilug-frontend
+  ports:
+  - port: 3000
+    targetPort: 3000
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: antipilug-frontend
+spec:
+  to:
+    kind: Service
+    name: antipilug-frontend
+  port:
+    targetPort: 3000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect 

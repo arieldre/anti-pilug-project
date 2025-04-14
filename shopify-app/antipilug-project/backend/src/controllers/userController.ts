@@ -22,7 +22,9 @@ export const getProfile = async (req: Request, res: Response) => {
 
     // Return user data without password
     const userData = user.toObject();
-    delete userData.password;
+    if ('password' in userData) {
+      delete userData.password;
+    }
     res.json(userData);
   } catch (error) {
     console.error('Error fetching profile:', error);

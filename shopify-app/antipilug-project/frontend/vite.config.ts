@@ -6,11 +6,16 @@ export default defineConfig({
   plugins: [react()] as any,
   server: {
     port: 3000,
+    host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://antipilug-backend:5000',
         changeOrigin: true,
       },
     },
+  },
+  preview: {
+    port: 3000,
+    host: '0.0.0.0',
   },
 })
