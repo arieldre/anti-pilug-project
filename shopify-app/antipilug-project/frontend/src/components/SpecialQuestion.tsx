@@ -1,6 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { QuestionnaireQuestion } from '../utils/questionnaireData';
 import './SpecialQuestion.scss';
+
+// --- PixelArrow Component (Keep as is) ---
+const PixelArrow = ({ x, y }: { x: number; y: number }) => (
+  <g transform={`translate(${x}, ${y})`}>
+    <filter id="shadow">
+      <feDropShadow dx="1" dy="1" stdDeviation="1" floodOpacity="0.3" />
+    </filter>
+    <g filter="url(#shadow)">
+      <polygon points="40,6 32,1 32,11" fill="#9e9e9e" stroke="#616161" strokeWidth="0.5" />
+      <rect x="8" y="4" width="24" height="4" fill="#8d6e63" stroke="#5d4037" strokeWidth="0.5" />
+      <rect x="0" y="3" width="8" height="6" fill="#5d4037" stroke="#3e2723" strokeWidth="0.5" />
+    </g>
+  </g>
+);
 
 interface SpecialQuestionProps {
   question: QuestionnaireQuestion;
@@ -9,8 +23,7 @@ interface SpecialQuestionProps {
 }
 
 const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onChange }) => {
-  // Move ALL hooks to the top level - no conditionals
-  // Initialize stones based on question type
+  // --- State Hooks (Keep all hooks at the top) ---
   const [stones, setStones] = useState<('left' | 'right')[]>(() => {
     if (question.specialType === 'securityWall') {
       const totalStones = question.options?.totalStones || 10;
@@ -26,15 +39,21 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
     }
     return Array(question.options?.totalStones || 10).fill('left');
   });
-  
-  const [leftCount, setLeftCount] = useState(stones.filter(s => s === 'left').length);
-  const [rightCount, setRightCount] = useState(stones.filter(s => s === 'right').length);
-  const [arrowsThrown, setArrowsThrown] = useState(0);
+  const [leftCount, setLeftCount] = useState(() => stones.filter(s => s === 'left').length);
+  const [rightCount, setRightCount] = useState(() => stones.filter(s => s === 'right').length);
+
+  // Dart/Bow specific state
+  const [arrowsThrown, setArrowsThrown] = useState(value || 0); // Initialize with passed value if dart type
   const [isAnimating, setIsAnimating] = useState(false);
   const [arrows, setArrows] = useState<{ x: number; y: number }[]>([]);
   const [currentArrow, setCurrentArrow] = useState<{ targetX: number; targetY: number } | null>(null);
+  const [isDraggingString, setIsDraggingString] = useState(false);
+  const [stringPosition, setStringPosition] = useState({ x: -12, y: 0 }); // Resting position
+  const bowStringRef = useRef<SVGPathElement>(null);
+  const [isTargetHit, setIsTargetHit] = useState(false);
+  const [releasedStringPos, setReleasedStringPos] = useState({ x: -12, y: 0 }); // Store release position
 
-  // Update counts when stones change
+  // --- Effects (Keep stone effect) ---
   useEffect(() => {
     if (question.specialType === 'securityWall') {
       setLeftCount(stones.filter((s) => s === 'left').length);
@@ -42,7 +61,49 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
     }
   }, [stones, question.specialType]);
 
-  // Handle drag start
+  // --- Bow Drag Effect ---
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (isDraggingString && bowStringRef.current) {
+        const svgRect = bowStringRef.current.ownerSVGElement!.getBoundingClientRect();
+        let relativeX = event.clientX - svgRect.left - 30; // Relative to bow group
+        let relativeY = event.clientY - svgRect.top - 160; // Relative to bow group
+        relativeX = Math.max(-52, Math.min(-12, relativeX)); // Clamp pull
+        relativeY = Math.max(-10, Math.min(10, relativeY)); // Clamp vertical
+        setStringPosition({ x: relativeX, y: relativeY });
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDraggingString) {
+        setIsDraggingString(false);
+        setReleasedStringPos(stringPosition); // Store release position for animation
+        if (stringPosition.x < -15) { // Shoot only if pulled back enough
+           shootArrow();
+        } else {
+           setStringPosition({ x: -12, y: 0 }); // Reset if not pulled enough
+        }
+      }
+    };
+
+    if (isDraggingString) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    } else {
+      // Only reset visual position if not animating the release
+      if (!isAnimating) {
+         setStringPosition({ x: -12, y: 0 });
+      }
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDraggingString, isAnimating, stringPosition]); // Dependencies
+
+  // --- Event Handlers (Keep stone handlers) ---
   const handleDragStart = (event: React.DragEvent, index: number) => {
     event.dataTransfer.setData('text/plain', index.toString());
     // Set drag image (optional)
@@ -55,13 +116,11 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
     element.classList.add('dragging');
   };
   
-  // Handle drag end to remove visual styling
   const handleDragEnd = (event: React.DragEvent) => {
     const element = event.currentTarget as HTMLElement;
     element.classList.remove('dragging');
   };
   
-  // Handle drop on a zone
   const handleDrop = (event: React.DragEvent, targetSide: 'left' | 'right') => {
     event.preventDefault();
     const index = parseInt(event.dataTransfer.getData('text/plain'));
@@ -81,39 +140,55 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
     }
   };
   
-  // Handle drag over
   const handleDragOver = (event: React.DragEvent) => {
     event.preventDefault(); // Allow drop
   };
 
-  const throwArrow = () => {
-    if (arrowsThrown < 10 && !isAnimating) {
-      setIsAnimating(true);
-      
-      // Calculate random position within target bounds
-      const angle = Math.random() * Math.PI * 2;
-      const distance = Math.random() * 90;
-      const targetX = Math.cos(angle) * distance;
-      const targetY = Math.sin(angle) * distance;
-      
-      setCurrentArrow({ targetX, targetY });
-
-      setTimeout(() => {
-        const newArrows = [...arrows, { x: targetX, y: targetY }];
-        setArrows(newArrows);
-        
-        const newArrowsThrown = arrowsThrown + 1;
-        setArrowsThrown(newArrowsThrown);
-        setIsAnimating(false);
-        setCurrentArrow(null);
-        
-        // Only return how many arrows are thrown
-        onChange(newArrowsThrown);
-      }, 600);
+  // --- Bow Handlers ---
+  const handleStringMouseDown = (event: React.MouseEvent) => {
+    if (arrowsThrown < 10 && !isAnimating && bowStringRef.current) {
+      setIsDraggingString(true);
+      event.preventDefault();
     }
   };
 
-  // Updated SecurityWall component with better drag handling
+  const shootArrow = () => {
+    if (arrowsThrown < 10 && !isAnimating) {
+      setIsAnimating(true); // START animation state
+
+      // Determine target
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * 80 + 10;
+      const targetX = Math.cos(angle) * distance;
+      const targetY = Math.sin(angle) * distance;
+
+      // Set the target for the current arrow being animated
+      setCurrentArrow({ targetX, targetY });
+
+      // Wait for animation duration (0.6s) then update state
+      setTimeout(() => {
+        const newArrows = [...arrows, { x: targetX, y: targetY }];
+        setArrows(newArrows); // Add arrow to landed list
+
+        const newArrowsThrown = arrowsThrown + 1;
+        setArrowsThrown(newArrowsThrown); // Increment count
+
+        setIsAnimating(false); // END animation state
+        setCurrentArrow(null); // Clear the animating arrow data
+        setStringPosition({ x: -12, y: 0 }); // Ensure string visually resets
+        onChange(newArrowsThrown); // Notify parent
+
+        // Trigger target wobble
+        setIsTargetHit(true);
+        setTimeout(() => setIsTargetHit(false), 200);
+
+      }, 600); // MUST match CSS animation duration
+    }
+  };
+
+  // --- Conditional Rendering ---
+
+  // Handle securityWall type (Keep as is)
   if (question.specialType === 'securityWall') {
     return (
       <div className="special-question security-wall">
@@ -198,115 +273,106 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
     );
   }
 
-  // Handle dartBoard type
+  // --- Handle dartBoard / dartThrow type ---
   if (question.specialType === 'dartBoard' || question.specialType === 'dartThrow') {
+
+    // --- ALL JAVASCRIPT CALCULATIONS MOVED HERE (Before Return) ---
+    // Bow Bending
+    const maxPull = 40;
+    // Use stringPosition state which is updated by the drag effect
+    const pullDistance = Math.abs(stringPosition.x - (-12));
+    const pullRatio = Math.min(1, pullDistance / maxPull);
+    const bendFactor = 0.6;
+    const upperControlX = 48 * (1 - pullRatio * bendFactor);
+    const upperControlY = -45 * (1 - pullRatio * bendFactor * 0.5);
+    const lowerControlX = 48 * (1 - pullRatio * bendFactor);
+    const lowerControlY = 45 * (1 - pullRatio * bendFactor * 0.5);
+
+    // Rotation Calculation
+    const calculateAngle = () => {
+      if (!currentArrow) return 0; // Needed when not animating
+      const startX = 70; const startY = 160; // Approx start point relative to SVG
+      const endX = 280 + currentArrow.targetX; const endY = 160 + currentArrow.targetY; // Target point
+      const deltaX = endX - startX; const deltaY = endY - startY;
+      return Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+    };
+    const flightAngle = calculateAngle(); // Calculate angle based on currentArrow
+    // --- END OF MOVED CALCULATIONS ---
+
     return (
       <div className="special-question dart-throw">
         <h3 className="question-text">{question.text}</h3>
-        
         <div className="instruction-text">
-          Show your passion for sports by shooting arrows at the target.
-          <br />
-          <small>Click the button below to shoot - more arrows = more interest!</small>
+          {/* Instruction for drag interaction */}
+          <small>Pull the bowstring back and release to shoot - more arrows = more interest!</small>
         </div>
-        
+
         <div className="target-container">
-          <svg width="480" height="320">
+          <svg width="480" height="320" style={{ userSelect: 'none' }}>
             <defs>
               <linearGradient id="bowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="20%" stopColor="#5d4037" />
-                <stop offset="80%" stopColor="#8d6e63" />
+                <stop offset="20%" stopColor="#5d4037" /> <stop offset="80%" stopColor="#8d6e63" />
               </linearGradient>
-              
-              {/* Add this new gradient for the background */}
               <radialGradient id="bgGradient" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
-                <stop offset="0%" stopColor="#444444" />
-                <stop offset="80%" stopColor="#333333" />
-                <stop offset="100%" stopColor="#222222" />
+                 <stop offset="0%" stopColor="#444444" /> <stop offset="80%" stopColor="#333333" /> <stop offset="100%" stopColor="#222222" />
               </radialGradient>
             </defs>
-            
-            {/* Replace the rectangle with this */}
+
+            {/* Background Rects */}
             <rect x="80" y="0" width="400" height="320" rx="8" fill="url(#bgGradient)" />
-            <rect x="80" y="0" width="400" height="320" rx="8" fill="url(#bgGradient)" 
-                  stroke="#555" strokeWidth="2" />
-            
-            {/* Target - Centered in the grey area */}
-            <g transform="translate(280, 160)">
-              {/* Outer ring - medium grey (darkened from light grey) */}
-              <circle cx="0" cy="0" r="120" fill="#212121" />
-              <circle cx="0" cy="0" r="118" fill="#9e9e9e" />
-              
-              {/* Second ring - darker grey */}
-              <circle cx="0" cy="0" r="95" fill="#212121" />
-              <circle cx="0" cy="0" r="93" fill="#757575" />
-              
-              {/* Third ring - very dark grey */}
-              <circle cx="0" cy="0" r="70" fill="#212121" />
-              <circle cx="0" cy="0" r="68" fill="#616161" />
-              
-              {/* Fourth ring - extremely dark grey */}
-              <circle cx="0" cy="0" r="45" fill="#212121" />
-              <circle cx="0" cy="0" r="43" fill="#424242" />
-              
-              {/* Fifth ring - nearly black */}
-              <circle cx="0" cy="0" r="20" fill="#212121" />
-              <circle cx="0" cy="0" r="18" fill="#323232" />
-              
-              {/* Accent ring - darker orange for maturity */}
-              <circle cx="0" cy="0" r="12" fill="#212121" />
-              <circle cx="0" cy="0" r="10" fill="#e65100" />
-              
-              {/* Bullseye - black with small white center */}
-              <circle cx="0" cy="0" r="5" fill="#000000" />
-              <circle cx="0" cy="0" r="2" fill="#ffffff" />
+            <rect x="80" y="0" width="400" height="320" rx="8" fill="none" stroke="#555" strokeWidth="2" />
+
+            {/* Target - Apply wobble class */}
+            {/* FIX: Added className for wobble */}
+            <g transform="translate(280, 160)" className={isTargetHit ? 'target-hit' : ''}>
+               {/* Outer ring */}
+               <circle cx="0" cy="0" r="120" fill="#212121" /> <circle cx="0" cy="0" r="118" fill="#9e9e9e" />
+               {/* Second ring */}
+               <circle cx="0" cy="0" r="95" fill="#212121" /> <circle cx="0" cy="0" r="93" fill="#757575" />
+               {/* Third ring */}
+               <circle cx="0" cy="0" r="70" fill="#212121" /> <circle cx="0" cy="0" r="68" fill="#616161" />
+               {/* Fourth ring */}
+               <circle cx="0" cy="0" r="45" fill="#212121" /> <circle cx="0" cy="0" r="43" fill="#424242" />
+               {/* Fifth ring */}
+               <circle cx="0" cy="0" r="20" fill="#212121" /> <circle cx="0" cy="0" r="18" fill="#323232" />
+               {/* Accent ring */}
+               <circle cx="0" cy="0" r="12" fill="#212121" /> <circle cx="0" cy="0" r="10" fill="#e65100" />
+               {/* Bullseye */}
+               <circle cx="0" cy="0" r="5" fill="#000000" /> <circle cx="0" cy="0" r="2" fill="#ffffff" />
             </g>
 
-            {/* Bow on the left - OUTSIDE the rectangle */}
+            {/* Bow */}
             <g className="bow" transform="translate(30, 160)">
-              {/* Bow gradient definition */}
-              <defs>
-                <linearGradient id="bowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="20%" stopColor="#5d4037" />
-                  <stop offset="80%" stopColor="#8d6e63" />
-                </linearGradient>
-              </defs>
-              
-              {/* Upper limb with curve - bigger */}
-              <path 
-                d="M5,-80 Q48,-45 10,0" 
-                stroke="url(#bowGradient)" 
-                strokeWidth="10" 
-                fill="none" 
-                strokeLinecap="round"
-              />
-              
-              {/* Lower limb with curve - bigger */}
-              <path 
-                d="M10,0 Q48,45 5,80" 
-                stroke="url(#bowGradient)" 
-                strokeWidth="10" 
-                fill="none" 
-                strokeLinecap="round"
-              />
-              
-              {/* Center grip decoration - bigger */}
-              <rect x="7" y="-18" width="7" height="36" rx="2" fill="#3e2723" />
-              <rect x="9" y="-15" width="3" height="30" rx="1" fill="#8d6e63" />
-              
-              {/* Bow string - will animate when shooting - longer */}
-              <path 
+              {/* REMOVED calculation code from here */}
+              {/* Use calculated variables for bow paths */}
+              <path d={`M5,-80 Q${upperControlX},${upperControlY} 10,0`} stroke="url(#bowGradient)" strokeWidth="10" fill="none" strokeLinecap="round" />
+              <path d={`M5,80 Q${lowerControlX},${lowerControlY} 10,0`} stroke="url(#bowGradient)" strokeWidth="10" fill="none" strokeLinecap="round" />
+              <rect x="0" y="-15" width="10" height="30" fill="#4e342e" rx="3" />
+              {/* Bow string - Use stringPosition state directly */}
+              <path
+                ref={bowStringRef}
                 className={isAnimating ? 'bowstring animating' : 'bowstring'}
-                d="M5,-80 L-12,0 L5,80" 
-                stroke="#e0e0e0" 
-                strokeWidth="1.5" 
+                // Use the stringPosition state directly for the pulled position
+                d={`M5,-80 L${isDraggingString ? stringPosition.x : (isAnimating ? 15 : -12)},${isDraggingString ? stringPosition.y : 0} L5,80`}
+                stroke="#e0e0e0"
+                strokeWidth="1.5"
                 fill="none"
+                onMouseDown={handleStringMouseDown}
+                style={{ cursor: arrowsThrown >= 10 || isAnimating ? 'default' : 'pointer' }}
               />
-              
+
               {/* String wrappings at the tips */}
               <circle cx="5" cy="-80" r="2" fill="#5d4037" />
               <circle cx="5" cy="80" r="2" fill="#5d4037" />
             </g>
+
+            {/* Arrow nocked on string while dragging */}
+            {isDraggingString && stringPosition.x < -12 && !isAnimating && (
+              <g transform={`translate(${30 + stringPosition.x + 5}, ${160 + stringPosition.y - 8})`}>
+                {/* Position arrow slightly behind the string pull point */}
+                <PixelArrow x={0} y={0} />
+              </g>
+            )}
 
             {/* Landed Arrows on target */}
             {arrows.map((arrow, index) => (
@@ -319,8 +385,10 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
             
             {/* Animating Arrow - starts from bow position */}
             {isAnimating && currentArrow && (
-              <g className="flying-arrow">
-                <PixelArrow x={40} y={152} />
+              // Set the starting position via transform
+              <g className="flying-arrow" transform="translate(40, 152)">
+                {/* Place the arrow at the group's origin */}
+                <PixelArrow x={0} y={0} />
               </g>
             )}
           </svg>
@@ -343,19 +411,37 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
               }
               
               .flying-arrow {
-                transform-origin: center;
-                animation: flyToTarget 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+                transform-origin: 8px 8px; // Set rotation origin to approx center of arrow
+                animation: flyToTarget 0.6s cubic-bezier(0.4, 0.1, 0.8, 0.2) forwards; // Adjusted bezier for arc feel
                 filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
               }
               
+              // Add rotation calculation
+              const calculateAngle = () => {
+                if (!currentArrow) return 0;
+                // Start point approx: bow x=30 + arrow offset x=40 = 70
+                // Start point approx: bow y=160 + arrow offset y=152 = 312 (relative to SVG top-left)
+                // Target point: target center x=280 + targetX offset
+                // Target point: target center y=160 + targetY offset
+                const startX = 70;
+                const startY = 160; // Arrow starts vertically centered with bow string pull point
+                const endX = 280 + currentArrow.targetX;
+                const endY = 160 + currentArrow.targetY;
+                const deltaX = endX - startX;
+                const deltaY = endY - startY;
+                return Math.atan2(deltaY, deltaX) * (180 / Math.PI); // Angle in degrees
+              };
+              const flightAngle = calculateAngle();
+
+              // Update the @keyframes flyToTarget
               @keyframes flyToTarget {
                 0% {
-                  transform: translate(0px, 0px);
+                  transform: translate(0px, 0px) rotate(${flightAngle}deg); // Add rotation
                   opacity: 1;
                 }
                 100% {
-                  transform: translate(${currentArrow ? (280 + currentArrow.targetX - 80) : 0}px, 
-                                    ${currentArrow ? (currentArrow.targetY) : 0}px);
+                  transform: translate(${currentArrow ? (240 + currentArrow.targetX) : 0}px,
+                                    ${currentArrow ? (8 + currentArrow.targetY) : 0}px) rotate(${flightAngle}deg); // Add rotation
                   opacity: 1;
                 }
               }
@@ -370,7 +456,7 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
         </div>
 
         <button
-          onClick={throwArrow}
+          onClick={shootArrow}
           disabled={arrowsThrown >= 10 || isAnimating}
           className="throw-button"
         >
@@ -398,30 +484,5 @@ const SpecialQuestion: React.FC<SpecialQuestionProps> = ({ question, value, onCh
     </div>
   );
 };
-
-const PixelArrow = ({ x, y }: { x: number; y: number }) => (
-  <g transform={`translate(${x}, ${y})`}>
-    {/* Drop shadow */}
-    <filter id="shadow">
-      <feDropShadow dx="1" dy="1" stdDeviation="1" floodOpacity="0.3" />
-    </filter>
-    
-    <g filter="url(#shadow)">
-      {/* Arrow head (metallic) */}
-      <polygon 
-        points="40,6 32,1 32,11" 
-        fill="#9e9e9e" 
-        stroke="#616161" 
-        strokeWidth="0.5"
-      />
-      
-      {/* Shaft (wooden) */}
-      <rect x="8" y="4" width="24" height="4" fill="#8d6e63" stroke="#5d4037" strokeWidth="0.5" />
-      
-      {/* Simple nock at the end */}
-      <rect x="0" y="3" width="8" height="6" fill="#5d4037" stroke="#3e2723" strokeWidth="0.5" />
-    </g>
-  </g>
-);
 
 export default SpecialQuestion;

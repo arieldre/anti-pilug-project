@@ -307,7 +307,7 @@ input[type="range"] {
   }
 
   &::-webkit-slider-thumb {
-    background: #1976D2; // Change from green to blue
+    background: hsl(210, 79%, 46%); // Change from green to blue
     border: 2px solid #1565C0;
   }
   
@@ -358,12 +358,12 @@ input[type="range"] {
     input[type="range"] {
       &::-webkit-slider-thumb {
         background: #2196F3;
-        border: 2px solid #0d47a1;
+        border: 1px solid #0d47a1;
       }
       
       &::-moz-range-thumb {
         background: #2196F3;
-        border: 2px solid #0d47a1;
+        border: 1px solid #0d47a1;
       }
     }
     
@@ -383,24 +383,24 @@ input[type="range"] {
   .scale-container {
     input[type="range"] {
       &::-webkit-slider-thumb {
-        background: #FF9800;
-        border: 2px solid #e65100;
+        background: #001aff;
+        border: 1px solid #0036e6;
       }
       
       &::-moz-range-thumb {
         background: #FF9800;
-        border: 2px solid #e65100;
+        border: 1px solid #e65100;
       }
     }
     
     .scale-value {
-      color: #FF9800;
+      color: #2f00ff;
       font-size: 18px;
     }
   }
   
   .question-text {
-    color: #e65100;
+    color: #004de6;
   }
 }
 
