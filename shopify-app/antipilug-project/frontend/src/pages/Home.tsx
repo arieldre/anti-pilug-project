@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { 
   Box, 
   Container, 
@@ -20,22 +19,27 @@ import { useNavigate } from 'react-router-dom';
 import ShareIcon from '@mui/icons-material/Share';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import './styles/Home.scss';
-import { contentAPI, userApi, questionApi } from '../services/api';
+import { contentAPI } from '../services/api';
 
 interface ContentItem {
-  id: number;
-  type: 'video' | 'talk' | 'research' | 'news';
+  _id: string;
+  type: 'video' | 'research' | 'news';
   title: string;
   description: string;
   imageUrl: string;
   date: string;
   link: string;
   tags: string[];
+  education: string;
+  militaryService: string;
+  city: string;
+  level: number;
+  politicalAlignment: number;
 }
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'video' | 'research' | 'news'>('all');
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,8 +49,9 @@ const Home: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await contentAPI.getContent('home');
-        setContent(data);
+        const data = await contentAPI.getRecommendedContent();
+        // Only show videos and research content on home page
+        setContent(data.filter(item => item.type === 'video' || item.type === 'research'));
       } catch (err) {
         setError('Failed to load content. Please try again later.');
         console.error('Error fetching content:', err);
@@ -58,13 +63,21 @@ const Home: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: 'all' | 'video' | 'research' | 'news') => {
     setActiveTab(newValue);
   };
 
   const handleShare = (item: ContentItem) => {
     // Implement share functionality
     console.log('Sharing:', item);
+  };
+
+  const handleViewMore = (type: 'video' | 'research') => {
+    if (type === 'video') {
+      navigate('/videos');
+    } else {
+      navigate('/research');
+    }
   };
 
   const filteredContent = activeTab === 'all' 
@@ -96,7 +109,7 @@ const Home: React.FC = () => {
             Anti-Plugging Solutions
           </Typography>
           <Typography variant="h4" className="hero-subtitle">
-            Stay informed with the latest updates and insights
+            Stay informed with personalized content based on your profile
           </Typography>
           <Button
             variant="contained"
@@ -106,7 +119,7 @@ const Home: React.FC = () => {
               document.getElementById('content-section')?.scrollIntoView({ behavior: 'smooth' });
             }}
           >
-            Explore Latest Updates
+            Explore Recommended Content
           </Button>
         </Container>
       </Box>
@@ -122,18 +135,16 @@ const Home: React.FC = () => {
           >
             <Tab label="All" value="all" />
             <Tab label="Videos" value="video" />
-            <Tab label="Talks" value="talk" />
             <Tab label="Research" value="research" />
-            <Tab label="News" value="news" />
           </Tabs>
         </Box>
 
         <Grid container spacing={3}>
           {filteredContent.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.id}>
+            <Grid item xs={12} sm={6} md={4} key={item._id}>
               <Card 
                 className="content-card"
-                onClick={() => navigate(item.link)}
+                onClick={() => item.link !== '#' && window.open(item.link, '_blank')}
               >
                 <CardMedia
                   component="img"
@@ -177,6 +188,23 @@ const Home: React.FC = () => {
             </Grid>
           ))}
         </Grid>
+
+        {activeTab === 'all' && (
+          <Box display="flex" justifyContent="center" mt={4} gap={2}>
+            <Button 
+              variant="contained" 
+              onClick={() => handleViewMore('video')}
+            >
+              View All Videos
+            </Button>
+            <Button 
+              variant="contained" 
+              onClick={() => handleViewMore('research')}
+            >
+              View All Research
+            </Button>
+          </Box>
+        )}
       </Container>
     </div>
   );

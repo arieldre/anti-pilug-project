@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: antipilug-backend
+spec:
+  selector:
+    app: antipilug-backend
+  ports:
+  - port: 5000
+    targetPort: 5000

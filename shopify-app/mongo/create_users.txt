@@ -1,0 +1,96 @@
+// Create the users collection with schema validation
+db.createCollection("users", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["email", "password", "name", "phoneNumber", "city", "birthDate", "education", "militaryService"],
+      properties: {
+        email: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        password: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        name: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        phoneNumber: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        city: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        birthDate: {
+          bsonType: "date",
+          description: "must be a date and is required"
+        },
+        education: {
+          bsonType: "string",
+          description: "must be a string and is required"
+        },
+        militaryService: {
+          bsonType: ["string", "null"],
+          description: "must be a string or null and is required"
+        },
+        coins: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 0
+        },
+        level: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 1
+        },
+        points: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 0
+        },
+        xpToNextLevel: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 100
+        },
+        callsMade: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 0
+        },
+        likesReceived: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 0
+        },
+        lastCalls: {
+          bsonType: "array",
+          description: "must be an array",
+          default: []
+        },
+        dailyStreak: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 0
+        },
+        bio: {
+          bsonType: "string",
+          description: "must be a string",
+          default: ""
+        },
+        questionnaireChangesLeft: {
+          bsonType: "int",
+          description: "must be an integer",
+          default: 3
+        }
+      }
+    }
+  }
+});
+
+// Create unique index on email
+db.users.createIndex({ "email": 1 }, { unique: true });

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.BACKEND_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -61,6 +61,10 @@ export const contentAPI = {
     const response = await api.get(`/content/${type}`);
     return response.data;
   },
+  getRecommendedContent: async () => {
+    const response = await api.get('/content/recommended');
+    return response.data;
+  }
 };
 
 export const videoAPI = {
