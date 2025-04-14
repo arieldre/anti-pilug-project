@@ -47,7 +47,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "${REACT_APP_API_URL:-http://localhost:5000}",
   "devDependencies": {
     "@types/bonjour": "^3.5.13",
     "@types/istanbul-lib-coverage": "^2.0.6",

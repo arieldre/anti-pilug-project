@@ -66,8 +66,8 @@ const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
     }
   };
 
-  const handleMatchmaking = () => {
-    navigate('/matchmaking');
+  const handleProfile = () => {
+    navigate('/profile');
   };
 
   const handleQuestionnaireClick = (event: React.MouseEvent) => {
@@ -92,8 +92,8 @@ const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
       path: '/shop',
     },
     {
-      label: 'Profile',
-      path: '/profile',
+      label: 'Matchmaking',
+      path: '/matchmaking',
     },
     {
       label: 'Help Center',
@@ -146,14 +146,7 @@ const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
             inputProps={{ 'aria-label': 'search' }}
           />
         </Search>
-        <Button color="inherit" onClick={handleMatchmaking}>Matchmaking</Button>
-        <Button 
-          component={Link}
-          to="/questionnaire"
-          color="inherit"
-        >
-          
-        </Button>
+        <Button color="inherit" onClick={handleProfile}>Profile</Button>
       </Toolbar>
     </AppBar>
   );
