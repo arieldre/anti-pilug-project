@@ -9,7 +9,7 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://antipilug-backend:5000',
+        target: process.env.REACT_APP_API_URL || 'http://localhost:5000',
         changeOrigin: true,
       },
     },
