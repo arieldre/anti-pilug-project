@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, InputBase, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, IconButton, InputBase, Box } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { Login as LoginIcon } from '@mui/icons-material';
 
 // Styled component for the search container
 const Search = styled('div')(({ theme }) => ({
@@ -44,12 +46,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-// Add this prop to your component
-interface NavbarProps {
-  onQuestionnaireClick?: () => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
+const Navbar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const navigate = useNavigate();
@@ -70,18 +67,10 @@ const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
     navigate('/profile');
   };
 
-  const handleQuestionnaireClick = (event: React.MouseEvent) => {
-    if (onQuestionnaireClick) {
-      event.preventDefault();
-      onQuestionnaireClick();
-    }
-  };
-
   const menuItems = [
     {
       label: 'Home',
       path: '/',
-      icon: <span className="nav-icon">🏠</span>,
     },
     {
       label: 'Videos',
@@ -105,7 +94,7 @@ const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
     },
     {
       label: 'Questionnaire',
-      path: '/questionnaire',  // Match the route in App.tsx
+      path: '/questionnaire/political', // Changed from '/questionnaires/political'
       icon: <span className="nav-icon">📝</span>,
     },
     
@@ -125,7 +114,6 @@ const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
                 color="inherit"
                 startIcon={item.icon}
                 className="nav-button"
-                onClick={item.path === '/questionnaire' ? handleQuestionnaireClick : undefined}
               >
                 {item.label}
               </Button>
@@ -152,8 +140,17 @@ const Navbar: React.FC<NavbarProps> = ({ onQuestionnaireClick }) => {
   );
 };
 
-Navbar.defaultProps = {
-  onQuestionnaireClick: undefined
-};
-
 export default Navbar;
+
+// Additional styles
+const styles = {
+  navbar: {
+    // ...existing styles...
+    navItem: {
+      // ...existing styles...
+      '&:hover': {
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      },
+    },
+  },
+};

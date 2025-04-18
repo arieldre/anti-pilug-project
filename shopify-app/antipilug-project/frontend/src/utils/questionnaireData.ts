@@ -1,34 +1,32 @@
 export interface QuestionnaireQuestion {
-  id: number | string;
-  text: string;
-  type: "scale" | "special";  // This restricts the type to only these two values
-  specialType?: string;
-  options?: {
-    leftSide?: {
-      label: string;
-      icon: string;
-      description: string;
+    id: number;
+    text: string;
+    type: 'scale' | 'special';
+    specialType?: 'securityWall' | 'balloon' | 'dartThrow';
+    options?: {
+        leftSide?: {
+            label: string;
+            icon: string;
+            description: string;
+        };
+        rightSide?: {
+            label: string;
+            icon: string;
+            description: string;
+        };
+        totalStones?: number;
+        hobbies?: {
+            label: string;
+            icon: string;
+        }[];
+        totalEnergy?: number;
+        dartboard?: {
+            sections: {
+                label: string;
+                value: number;
+            }[];
+        };
     };
-    rightSide?: {
-      label: string;
-      icon: string;
-      description: string;
-    };
-    totalStones?: number;
-    hobbies?: {
-      label: string;
-      icon: string;
-    }[];
-    totalEnergy?: number;
-    dartboard?: {
-      sections?: {
-        label: string;
-        value: number;
-      }[];
-      maxScore?: number;
-      randomPlacement?: boolean;
-    };
-  };
 }
 
 export const politicalQuestions: QuestionnaireQuestion[] = [
@@ -78,7 +76,7 @@ export const politicalQuestions: QuestionnaireQuestion[] = [
         icon: "🤝",
         description: "Prefer diplomatic solutions"
       },
-      totalStones: 10
+      totalStones: 12
     }
   },
   {
@@ -108,73 +106,66 @@ export const politicalQuestions: QuestionnaireQuestion[] = [
   }
 ];
 
-// Make sure your hobbiesQuestions array has all 12 questions:
-export const hobbiesQuestions: QuestionnaireQuestion[] = [
+export const hobbiesQuestions = [
   {
-    id: "hobby1",
-    text: "How passionate are you about music—listening, discovering new artists, or playing instruments?",
-    type: "scale"
+    id: 'h1',
+    text: 'How interested are you in discussing movies, TV shows, or entertainment trends?',
+    type: 'scale'
   },
   {
-    id: "hobby2",
-    text: "How much do you enjoy movies, TV shows, or entertainment trends?",
-    type: "scale"
+    id: 'h2',
+    text: 'How much do you enjoy talking about music—listening, discovering new artists, or playing instruments?',
+    type: 'scale'
   },
   {
-    id: "hobby3",
-    text: "How important are books, stories, or interesting articles in your life?",
-    type: "scale"
+    id: 'h3',
+    text: 'How interested are you in video games, board games, or strategy-based games?',
+    type: 'scale'
   },
   {
-    id: "hobby4",
-    text: "How excited do you get about technology, new gadgets, or digital trends?",
-    type: "scale"
+    id: 'h4',
+    text: 'How much do you enjoy talking about food—cooking, trying new restaurants, or exploring different cuisines?',
+    type: 'scale'
   },
   {
-    id: "hobby5",
-    text: "How much pleasure do you take in food—cooking, trying new restaurants, or exploring different cuisines?",
-    type: "scale"
+    id: 'h5',
+    text: 'How excited are you to talk about travel experiences, places you\'ve been, or places you want to visit?',
+    type: 'scale'
   },
   {
-    id: "hobby6",
-    text: "How much do you value travel experiences, visiting new places, or planning future trips?",
-    type: "scale"
+    id: 'h6',
+    text: 'How much do you enjoy discussing books, stories, or interesting articles you\'ve read?',
+    type: 'scale'
   },
   {
-    id: "hobby7",
-    text: "How passionate are you about sports—watching games, playing, or following teams?",
-    type: "special",
-    specialType: "dartThrow",
-    options: {
-      dartboard: {
-        maxScore: 10,
-        randomPlacement: true
-      }
-    }
+    id: 'h7',
+    text: 'How much do you enjoy talking about sports—whether watching games, playing, or following teams?',
+    type: 'special',
+    specialType: 'dartBoard'  // Make sure this matches exactly what the component is checking for
   },
   {
-    id: "hobby8",
-    text: "How much fun do you have with video games, board games, or strategy-based activities?",
-    type: "scale"
+    id: 'h8',
+    text: 'How interested are you in talking about technology, new gadgets, or digital trends?',
+    type: 'scale'
   },
   {
-    id: "hobby9",
-    text: "How drawn are you to art, photography, design, or DIY projects?",
-    type: "scale"
+    id: 'h9',
+    text: 'How much do you enjoy discussing art, photography, design, or DIY projects?',
+    type: 'scale'
   },
   {
-    id: "hobby10",
-    text: "How fascinating do you find science, space exploration, or interesting facts about our world?",
-    type: "scale"
+    id: 'h10',
+    text: 'How excited are you to talk about science, space, or cool facts about the world?',
+    type: 'scale'
   },
   {
-    id: "hobby11",
-    text: "How much do you appreciate humor, internet trends, memes, or random trivia?",
-    type: "scale"
+    id: 'h11',
+    text: 'How much do you enjoy discussing funny topics, internet trends, memes, or random trivia?',
+    type: 'scale'
   },
   {
-    id: "hobby12",
-    text: "How curious are you about history, world cultures, or significant past events?",
-    type: "scale"
+    id: 'h12',
+    text: 'How interested are you in talking about history, world cultures, or interesting past events?',
+    type: 'scale'
   }
 ];

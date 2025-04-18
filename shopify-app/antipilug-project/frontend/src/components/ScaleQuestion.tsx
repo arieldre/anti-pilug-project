@@ -22,7 +22,7 @@ const ScaleQuestion: React.FC<ScaleQuestionProps> = ({ question, value, onChange
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value))}
           style={{
-            background: `linear-gradient(to right, #1976D2 ${percentage}%, #e0e0e0 ${percentage}%)`
+            background: `linear-gradient(to right, #4caf50 ${percentage}%, #e0e0e0 ${percentage}%)`
           }}
         />
         <span className="scale-value">{value}</span>
