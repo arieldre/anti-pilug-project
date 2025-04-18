@@ -1,53 +1,50 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { hobbiesQuestions } from '../../utils/questionnaireData';
-import ScaleQuestion from '../../components/ScaleQuestion';
-import SpecialQuestion from '../../components/SpecialQuestion';
-import './Questionnaire.scss';
+import { hobbiesQuestions, QuestionnaireQuestion } from '../../utils/questionnaireData';
+import HobbiesScaleQuestion from '../../components/HobbiesScaleQuestion';
+// Import other components as needed
 
-const HobbiesQuestionnaire: React.FC = () => {
-  const navigate = useNavigate();
-  const [answers, setAnswers] = useState<number[]>(new Array(hobbiesQuestions.length).fill(5));
+interface HobbiesQuestionnaireProps {
+  onComplete: (answers: Record<string | number, any>) => void;
+}
 
-  const handleAnswerChange = (index: number, value: number) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = value;
-    setAnswers(newAnswers);
+const HobbiesQuestionnaire: React.FC<HobbiesQuestionnaireProps> = ({ onComplete }) => {
+  const [answers, setAnswers] = useState<Record<string | number, any>>({});
+
+  const handleAnswer = (questionId: string | number, value: any) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
   };
 
-  const handleNext = () => {
-    // Here you can save the answers if needed
-    navigate('/home');
+  const handleSubmit = () => {
+    onComplete(answers);
   };
 
   return (
-    <div className="questionnaire-container">
-      <div className="questionnaire-section">
-        <h2>Hobbies and Values Questionnaire</h2>
-        <div className="questions-list">
-          {hobbiesQuestions.map((question, index) => (
-            <div key={question.id} className="question-item">
-              <div className="question-number">Question {index + 1}</div>
-              {question.type === 'scale' ? (
-                <ScaleQuestion 
-                  question={question} 
-                  value={answers[index]}
-                  onChange={(value) => handleAnswerChange(index, value)}
-                />
-              ) : (
-                <SpecialQuestion 
-                  question={question}
-                  value={answers[index]}
-                  onChange={(value) => handleAnswerChange(index, value)}
-                />
-              )}
-            </div>
-          ))}
+    <div className="hobbies-questionnaire">
+      <h2>Interests & Hobbies</h2>
+      {hobbiesQuestions.map((question: QuestionnaireQuestion) => (  // Add the type annotation here
+        <div key={String(question.id)} className="question-container">
+          {question.type === 'scale' ? (
+            <HobbiesScaleQuestion
+              question={question}
+              value={answers[question.id] || 5}
+              onChange={(value) => handleAnswer(question.id, value)}
+            />
+          ) : (
+            // Handle special question types here
+            <div>Special question component would go here</div>
+          )}
         </div>
-        <button className="next-button" onClick={handleNext}>
-          Finish Questionnaires
-        </button>
-      </div>
+      ))}
+      <button 
+        className="submit-button"
+        onClick={handleSubmit}
+        disabled={hobbiesQuestions.some(q => !answers.hasOwnProperty(q.id))}
+      >
+        Submit
+      </button>
     </div>
   );
 };

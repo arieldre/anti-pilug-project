@@ -191,18 +191,26 @@
       border-left: 4px solid #2196f3;
       
       small {
-        color: #616161;
+        color: #2c2b2b;
       }
     }
 
     .target-container {
       margin: 1.5rem 0;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #f0f0f0, #e6e6e6);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      padding: 1rem;
-      max-width: 340px;
+      padding: 1rem 0.5rem; // Less horizontal padding
+      max-width: 480px; // Increased to accommodate bow outside rectangle
       overflow: visible;
+      position: relative;
+      background-color: transparent; // Make sure this is transparent
+      box-shadow: none; // Remove any shadow if you don't want a container effect
+      border: none; // Remove any border
+      
+      svg {
+        display: block; // Ensures SVG displays properly
+        width: 100%;
+        height: auto;
+        filter: none; // Remove filter if you don't want SVG shadow
+      }
     }
 
     .arrows-count {
