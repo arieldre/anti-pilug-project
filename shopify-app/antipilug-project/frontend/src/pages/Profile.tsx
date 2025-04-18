@@ -20,7 +20,7 @@ import { MonetizationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import './Profile.scss';
-import { userAPI, contentAPI } from '../services/api';
+import { userAPI } from '../services/api';
 
 interface UserProfile {
   _id: string;
@@ -56,7 +56,6 @@ const Profile: React.FC = () => {
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [content, setContent] = useState(null);
 
   const fetchUserProfile = async () => {
     try {
@@ -64,10 +63,6 @@ const Profile: React.FC = () => {
       setError(null);
       const userData = await userAPI.getProfile();
       setUserProfile(userData);
-      
-      // Fetch user's content
-      const contentData = await contentAPI.getContent('profile');
-      setContent(contentData);
     } catch (err) {
       if (err instanceof Error && err.message === 'User not authenticated') {
         navigate('/login');
@@ -298,17 +293,6 @@ const Profile: React.FC = () => {
           </Card>
         </div>
       </div>
-
-      {content && (
-        <Paper sx={{ p: 3, mt: 3 }}>
-          <Typography variant="h5" gutterBottom>
-            Your Content
-          </Typography>
-          <Typography variant="body1">
-            {content?.description}
-          </Typography>
-        </Paper>
-      )}
     </div>
   );
 };

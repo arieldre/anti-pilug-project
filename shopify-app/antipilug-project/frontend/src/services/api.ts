@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// In CRA, environment variables are available at build time
+// They need to be prefixed with REACT_APP_
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+// Debug logs
+console.log('API_URL:', API_URL);
+console.log('process.env:', process.env);
+console.log('REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
