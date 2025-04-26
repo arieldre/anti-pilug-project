@@ -1,3 +1,8 @@
+oc exec -it mongodb-5bf58bd485-fgs62 -c mongodb -- /bin/bash
+mongosh
+use antipilug
+show collections
+
 db.recommendedcontents.insertMany([
   {
     type: "video",
