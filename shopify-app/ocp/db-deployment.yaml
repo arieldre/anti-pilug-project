@@ -12,7 +12,11 @@ spec:
       labels:
         app: mongodb
     spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
+      restartPolicy: Always
       containers:
+        imagePullPolicy: Always
       - name: mongodb
         image: mongo:latest
         ports:
