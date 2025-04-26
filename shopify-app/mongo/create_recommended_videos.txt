@@ -1,4 +1,4 @@
-oc exec -it mongodb-5bf58bd485-fgs62 -c mongodb -- /bin/bash
+oc exec -it mongodb-5bf58bd485-fgs62 -c mongodb -- /bin/sh
 mongosh
 use antipilug
 show collections
