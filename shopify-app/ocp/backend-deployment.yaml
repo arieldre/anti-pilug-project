@@ -19,9 +19,12 @@ spec:
         image: liorshem/antipilug-backend:latest
         ports:
         - containerPort: 5000
+        imagePullPolicy: Always
         env:
         - name: MONGODB_URI
           value: "mongodb://mongodb:27017/antipilug"
+        - name: FRONTEND_URL
+              value: 'https://antipilug-frontend-antipilug.apps.gpu-nested.med.one'
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
