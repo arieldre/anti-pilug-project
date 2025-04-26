@@ -94,3 +94,27 @@ db.createCollection("users", {
 
 // Create unique index on email
 db.users.createIndex({ "email": 1 }, { unique: true });
+
+
+// Create the User
+db.users.insertOne({
+  email: 'lior849@gmail.com',
+  password: '12345678',
+  name: 'Lior Shem',
+  phoneNumber: '0525517786',
+  city: 'פתח תקווה',
+  birthDate: new Date('1995-03-03'),
+  education: 'Doctorate',
+  militaryService: 'Currently Serving',
+  bio: '',
+  coins: 0,
+  level: 1,
+  points: 0,
+  xpToNextLevel: 100,
+  callsMade: 0,
+  likesReceived: 0,
+  lastCalls: [],
+  dailyStreak: 0,
+  questionnaireChangesLeft: 3,
+  createdAt: new Date()
+})
