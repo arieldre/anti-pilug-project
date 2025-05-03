@@ -1,6 +1,7 @@
 import React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material';
-import Router from './router';
+import Router from './router/index';
+import './styles/videoflow.scss';
 
 const theme = createTheme({
   palette: {
@@ -16,7 +17,9 @@ const theme = createTheme({
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <Router />
+      <div className="app-container">
+        <Router />
+      </div>
     </ThemeProvider>
   );
 };

@@ -1,0 +1,40 @@
+.waiting-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--background);
+
+  .waiting-content {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--card);
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .waiting-title {
+      margin: 1rem 0;
+      color: var(--foreground);
+    }
+
+    .waiting-description {
+      color: var(--muted-foreground);
+      margin-bottom: 1.5rem;
+    }
+
+    .connect-button {
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: hsl(var(--primary) / 0.9);
+      }
+    }
+  }
+}

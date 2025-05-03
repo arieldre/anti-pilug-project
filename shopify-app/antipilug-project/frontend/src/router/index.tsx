@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import AuthLayout from '../layouts/AuthLayout';
-import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 // Auth Pages
 import SignUpPage from '../pages/SignUpPage';
@@ -19,6 +18,7 @@ import Matchmaking from '../pages/Matchmaking';
 import SearchResults from '../pages/SearchResults';
 import Research from '../pages/Research';
 import VideoPage from '../pages/VideoPage';
+import VideoFlowPage from '../pages/videoflow/VideoFlowPage';
 
 // Games and Interactive
 import BuildCity from '../pages/BuildCity';
@@ -54,6 +54,7 @@ const Router: React.FC = () => {
         {/* Games */}
         <Route path="/build-city" element={<BuildCity />} />
         <Route path="/flappy-bird-game" element={<FlappyBirdGame />} />
+        <Route path="/videoflow" element={<VideoFlowPage />} />
         
         {/* Questionnaires */}
         <Route path="/questionnaire">

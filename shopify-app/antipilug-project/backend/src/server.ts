@@ -13,7 +13,8 @@ import questionRoutes from './routes/questionRoutes';
 import authRoutes from './routes/authRoutes';
 
 dotenv.config();
-
+console.log("frontend url");
+console.log(process.env.FRONTEND_URL);
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/antipilug';

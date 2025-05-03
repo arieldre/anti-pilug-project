@@ -1,0 +1,81 @@
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --primary: #1976d2;
+  --secondary: #dc004e;
+  --muted: #f4f4f5;
+  --muted-foreground: #818cf8;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #1976d2;
+  --radius: 0.5rem;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground;
+}
+
+.app-container {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.video-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.game-option {
+  background-color: var(--card);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.waiting-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.videoflow-button {
+  @apply px-4 py-2 rounded-md font-medium transition-colors;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: darken(var(--primary), 10%);
+  }
+}
+
+.videoflow-input {
+  @apply px-3 py-2 rounded-md border border-input bg-background;
+}
+
+.videoflow-toast {
+  @apply p-3 rounded-md shadow-md;
+  background-color: var(--card);
+  color: var(--card-foreground);
+}
+
+.videoflow-dialog {
+  @apply p-6 rounded-md shadow-lg;
+  background-color: var(--card);
+  color: var(--card-foreground);
+}
