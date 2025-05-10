@@ -1,0 +1,27 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-pv-mongodb
+spec:
+  capacity:
+    storage: 5Gi
+  local:
+    path: /mnt/data/mongodb
+    fsType: xfs
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+    kind: PersistentVolumeClaim
+    namespace: antipilug
+    name: mongodb-pvc-local
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local
+  volumeMode: Filesystem
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - worker-b.gpu-nested.med.one.43.168.192.in-addr.arpa

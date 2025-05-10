@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Find user by email
     const user = await User.findOne({ email });
-    if (!user) {
+    if (!user || !user.password) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 

@@ -63,8 +63,8 @@ const Navbar: React.FC = () => {
     }
   };
 
-  const handleMatchmaking = () => {
-    navigate('/matchmaking');
+  const handleProfile = () => {
+    navigate('/profile');
   };
 
   const menuItems = [
@@ -81,8 +81,8 @@ const Navbar: React.FC = () => {
       path: '/shop',
     },
     {
-      label: 'Profile',
-      path: '/profile',
+      label: 'Matchmaking',
+      path: '/matchmaking',
     },
     {
       label: 'Help Center',
@@ -134,7 +134,7 @@ const Navbar: React.FC = () => {
             inputProps={{ 'aria-label': 'search' }}
           />
         </Search>
-        <Button color="inherit" onClick={handleMatchmaking}>Matchmaking</Button>
+        <Button color="inherit" onClick={handleProfile}>Profile</Button>
       </Toolbar>
     </AppBar>
   );

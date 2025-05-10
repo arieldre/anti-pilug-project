@@ -1,9 +1,12 @@
 import express from 'express';
-import { getContent, updateContent } from '../controllers/contentController';
+import { getContent, updateContent, getRecommendedContent } from '../controllers/contentController';
+import { protect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.get('/:page', getContent);
-router.put('/:page', updateContent);
+// Important: More specific routes should come before parameter routes
+router.get('/recommended', protect, getRecommendedContent);
+router.get('/:page', protect, getContent);
+router.put('/:page', protect, updateContent);
 
 export default router; 
