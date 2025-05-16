@@ -2,6 +2,7 @@
   --background: #ffffff;
   --foreground: #000000;
   --primary: #1976d2;
+  --primary-hover: #1565c0; /* Manually darkened version of primary color */
   --secondary: #dc004e;
   --muted: #f4f4f5;
   --muted-foreground: #818cf8;
@@ -60,7 +61,7 @@ body {
   cursor: pointer;
   
   &:hover {
-    background-color: darken(var(--primary), 10%);
+    background-color: var(--primary-hover);
   }
 }
 
